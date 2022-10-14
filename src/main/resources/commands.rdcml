@@ -1,0 +1,18 @@
+nightmarket,nmarket,nightm {
+    hook open
+    help Opens the NightMarket GUI.
+    user player
+}
+
+nightmarketadmin,adminnightmarket,nmarketadmin,nightmarket-admin {
+  reload {
+    hook reload
+    help Reloads the NightMarket configuration.
+    permission nightmarket.admin
+  }
+  forcerotate player:player {
+    hook forcerotate
+    help Forcefully rotate provided player's NightMarket shop.
+    permission nightmarket.admin
+  }
+}

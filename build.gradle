@@ -1,0 +1,94 @@
+plugins {
+    id 'java'
+    id 'idea'
+    id "com.github.johnrengelman.shadow" version "7.1.2"
+}
+
+group = 'me.byteful.plugin.nightmarket'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'spigotmc-repo'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+    maven {
+        name = 'sonatype'
+        url = 'https://oss.sonatype.org/content/groups/public/'
+    }
+    maven {
+        name = 'jitpack'
+        url = 'https://jitpack.io'
+    }
+    maven {
+        name = 'redempt'
+        url = 'https://redempt.dev'
+    }
+    maven {
+        name = 'placeholder-api'
+        url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
+    }
+    maven {
+        name = 'lucko'
+        url = "https://repo.lucko.me/"
+    }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+    implementation 'com.github.cryptomorin:XSeries:9.1.0'
+    implementation 'com.github.Redempt:RedLib:6.5.8'
+    //implementation 'me.lucko:helper:5.6.13'
+    compileOnly 'me.clip:placeholderapi:2.11.2'
+
+    compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
+    compileOnly 'mysql:mysql-connector-java:8.0.30'
+    compileOnly 'org.xerial:sqlite-jdbc:3.39.3.0'
+}
+
+def targetJavaVersion = 8
+java {
+    def javaVersion = JavaVersion.toVersion(targetJavaVersion)
+    sourceCompatibility = javaVersion
+    targetCompatibility = javaVersion
+    if (JavaVersion.current() < javaVersion) {
+        toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    if (targetJavaVersion >= 10 || JavaVersion.current().isJava10Compatible()) {
+        options.release = targetJavaVersion
+    }
+}
+
+processResources {
+    def props = [version: version]
+    inputs.properties props
+    filteringCharset 'UTF-8'
+    filesMatching('*.yml') {
+        expand props
+    }
+}
+
+shadowJar {
+    minimize()
+    archiveBaseName.set("NightMarket")
+    archiveClassifier.set("")
+
+    relocate 'com.cryptomorin.xseries', 'me.byteful.plugin.nightmarket.libs.xseries'
+//    relocate 'com.mongodb', 'me.byteful.plugin.nightmarket.libs.mongo'
+//    relocate 'org.bson', 'me.byteful.plugin.nightmarket.libs.bson'
+//    relocate 'com.mysql', 'me.byteful.plugin.nightmarket.libs.mysql'
+//    relocate ('org.sqlite', 'me.byteful.plugin.nightmarket.libs.sqlite') {
+//        exclude 'org.sqlite.core.NativeDB'
+//        exclude 'org.sqlite.Collation'
+//        exclude 'org.sqlite.Function$Window'
+//        exclude 'org.sqlite.core.DB$ProgressObserver'
+//        exclude 'org.sqlite.ProgressHandler'
+//    }
+    relocate 'redempt', 'me.byteful.plugin.nightmarket.libs.redempt'
+    //relocate 'me.lucko', 'me.byteful.plugin.nightmarket.libs.lucko'
+}

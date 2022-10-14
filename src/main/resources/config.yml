@@ -1,0 +1,224 @@
+#
+# NightMarket v{version} by byteful#0001
+#
+
+# Attention! Support will not be given to those who have not purchased this plugin through SpigotMC.
+
+# [-----------------------------------------------------------------------------------------------]
+#
+# Useful Links:
+#   => https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/Material.html
+#   => https://minecraft-heads.com/player-heads
+#   => https://wiki.vg/images/b/bb/DoubleChest-slots.png
+#
+# With text/messages, color codes, hex codes, and PlaceholderAPI (in some instances) is supported.
+#
+# [-----------------------------------------------------------------------------------------------]
+
+# Configuration for currency implementations. Use this with external dependencies to add their currency managers in.
+currencies:
+  - "me.byteful.plugin.nightmarket.currency.impl.VaultCurrency"
+
+# Configuration for the data store used to store players' current shop rotation. Remote databases are supported for cross-server night markets.
+# > Types:
+#   - Remote Databases: (You will need to use one of these for cross-server night markets!)
+#       => MySQL (remote relation-based database, may have connection/lag issues)
+#
+#       => MongoDB (remote document-based database, may have connection/lag issues)
+#
+#   - Local Databases: (These will only store player night markets on the current server!)
+#       => JSON (human-readable text format, prone to corruption and error)
+#
+#       => SQLite (flatfile relation-based database that lives in the plugins' folder, fast and stable)
+#
+datastore:
+  type: "SQLite"
+  # Only required if type is set to MySQL!
+  mysql_uri: "jdbc:mysql://username:password@host:port/database"
+  # Only required if type is set to MongoDB!
+  mongo:
+    uri: "mongodb://username:password@host:port"
+    database: "NightMarket"
+
+# Configuration for other miscellaneous settings.
+other:
+  # Should the GUI close after buying an item?
+  close_on_buy: true
+  # Should an announcement be sent when shops have rotated?
+  rotate_announcement: true
+
+# Configuration for all the items that this plugin chooses from. Items will be randomly selected for players' shops based on their rarity.
+# > Higher the rarity, the more common.
+# > Example item configuration:
+#  ItemId:
+#    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+#      name: "diamond sword" # The display name of the icon displayed in the shop.
+#      lore:
+#        - "hello" # The lore of the icon displayed in the shop.
+#      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+#    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item.
+#    price:
+#      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+#      amount: 6.9 # The actual amount of currency the item costs.
+#
+items:
+  # This ID will be stored with player's current shop rotation so changing these can cause unexpected results.
+  ItemId:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+  ItemId1:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword1" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+  ItemId2:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword2" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+  ItemId3:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword3" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+  ItemId4:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword4" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+  ItemId5:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword5" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+  ItemId6:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword6" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello u can buy this one multiple times"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: true # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+  ItemId7:
+    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
+      name: "diamond sword7" # The display name of the icon displayed in the shop.
+      lore: # The lore of the icon displayed in the shop.
+        - "hello"
+        - "&6Price: 6.90"
+      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
+      # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
+    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
+    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    price:
+      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
+      amount: 6.9 # The actual amount of currency the item costs.
+
+# The schedule for the opening and closing of the night market. Times and dates depend on server time, so please change that in your system.
+access_schedule:
+  mode: "DATE" # Modes: DATE - specific dates in the year, TIMES - specific times every day
+  # Specific config for the DATE mode.
+  # Preferred date format: (month/day/year hour:minute:second AM/PM) (MM/DD/YYYY HH:MM:SS AM/PM)
+  dates:
+    - start: "12/31/2022 12:00:00 AM"
+      end: "01/01/2023 12:00:00 AM"
+    - start: "02/05/2023 12:00:00 AM"
+      end: "02/10/2023 12:00:00 AM"
+  # Specific config for the TIMES mode. Uses AM and PM or 24 hour time.
+  # Preferred time format: (hour:minute:second AM/PM) (HH:MM:SS AM/PM)
+  times:
+    - start: "06:00:00 AM"
+      end: "08:00:00 AM"
+    - start: "12:00:00 PM"
+      end: "01:00:00 AM"
+
+# The schedule for rotating the items in each players' night market. Times and dates depend on server time, so please change that in your system.
+rotate_schedule:
+  mode: "DATE" # Modes: DATE - specific dates in the year, TIMES - specific times every day
+  # Specific config for the DATE mode.
+  # Preferred date format: (month/day/year hour:minute:second) (MM/DD/YYYY HH:MM:SS)
+  dates:
+    - "12/31/2022 12:00:00 AM"
+    - "01/01/2023 12:00:00 AM"
+  # Specific config for the TIMES mode. Uses AM and PM or 24 hour time.
+  # Preferred time format: (hour:minute AM/PM)
+  times:
+    - "06:00:00 AM"
+    - "12:00:00 AM"
+
+# Settings for the GUI displayed when running /nightmarket
+gui:
+  background_icon:
+    name: " "
+    lore:
+      - ""
+    material: GRAY_STAINED_GLASS_PANE # player_head instead of material also supported here.
+  # Title of the GUI
+  title: "&6NightMarket"
+  # Number of rows in the GUI
+  rows: 3
+  # The GUI slots that will be populated with the background_icon item.
+  # You may use '-' to indicate to. EX: 1-24 means all slots from 1 to 24.
+  background_slots:
+    - "0-8"
+    - "9"
+    - "17"
+    - "18-26"
+  # The GUI slots that items will be placed in. [!] The number of slots here will determine the number of randomly-picked shop items. [!]
+  # You may use '-' to indicate to. EX: 1-24 means all slots from 1 to 24.
+  item_slots:
+    - "10-16"
