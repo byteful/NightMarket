@@ -1,7 +1,7 @@
 cannot_afford: &cYou cannot afford this item!
 already_purchased: &cThis item cannot be purchased again!
 successfully_purchased_item: &aSuccessfully purchased item.
-shop_not_open: &cThe shop is not currently open!
+shop_not_open: &cThe shop is not currently open! It will open at: %nightmarket_open%
 rotate_announcement: &6The NightMarket has rotated!
 reload_success: &aSuccessfully reloaded NightMarket's configuration.
 force_rotated: &aForcefully rotated {player}'s shop.

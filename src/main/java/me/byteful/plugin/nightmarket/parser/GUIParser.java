@@ -6,6 +6,7 @@ import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.inventorygui.ItemButton;
@@ -19,7 +20,7 @@ public class GUIParser {
     final String title = config.getString("title");
     final int rows = config.getInt("rows");
     Preconditions.checkArgument(rows > 0 && rows < 7, "Rows needs to be greater than 0 and less than 7!");
-    final ItemStack backgroundIcon = IconParser.parse(null, config.getConfigurationSection("background_icon"));
+    final ItemStack backgroundIcon = IconParser.parse(config.getConfigurationSection("background_icon"));
     final List<String> backgroundSlots = config.getStringList("background_slots");
     final List<String> itemSlots = config.getStringList("item_slots");
     Preconditions.checkArgument(itemSlots.size() > 0, "Item slots need to be greater than 0!");
@@ -66,15 +67,19 @@ public class GUIParser {
         final ShopItem item = plugin.getShopItemRegistry().get(items.get(i));
 
         gui.addButton(slot, ItemButton.create(item.getIcon(), e -> {
+          if (!(e.getWhoClicked() instanceof Player)) {
+            return;
+          }
+
           if (!item.isMultiplePurchase() && player.hasPurchasedItem(item.getId())) {
-            e.getWhoClicked().sendMessage(plugin.getMessages().get("already_purchased"));
+            e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "already_purchased"));
             e.getWhoClicked().closeInventory();
 
             return;
           }
 
           if (!item.getCurrency().canPlayerAfford(player.getUniqueId(), item.getAmount())) {
-            e.getWhoClicked().sendMessage(plugin.getMessages().get("cannot_afford"));
+            e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "cannot_afford"));
             e.getWhoClicked().closeInventory();
 
             return;
@@ -82,10 +87,10 @@ public class GUIParser {
 
           player.purchaseItem(item);
           Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDataStoreProvider().setPlayerShop(player));
-          if(plugin.getConfig().getBoolean("other.close_on_buy")) {
+          if (plugin.getConfig().getBoolean("other.close_on_buy")) {
             e.getWhoClicked().closeInventory();
           }
-          e.getWhoClicked().sendMessage(plugin.getMessages().get("successfully_purchased_item"));
+          e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "successfully_purchased_item"));
         }));
       }
 

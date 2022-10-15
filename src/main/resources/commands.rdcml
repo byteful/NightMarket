@@ -15,4 +15,10 @@ nightmarketadmin,adminnightmarket,nmarketadmin,nightmarket-admin {
     help Forcefully rotate provided player's NightMarket shop.
     permission nightmarket.admin
   }
+  debug {
+    hook debug
+    help Provides debug information to give to support.
+    permission nightmarket.admin
+    user console
+  }
 }

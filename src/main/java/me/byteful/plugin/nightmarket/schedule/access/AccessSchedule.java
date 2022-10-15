@@ -18,4 +18,8 @@ public class AccessSchedule {
 
     return now.isAfter(start) && now.isBefore(end);
   }
+
+  public LocalDateTime getStart() {
+    return start;
+  }
 }

@@ -45,7 +45,7 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
       statement.setBytes(1, SQLUtils.serializeUUID(player));
 
       try (ResultSet set = statement.executeQuery()) {
-        if(!set.next()) {
+        if (!set.next()) {
           return Optional.empty();
         }
         final List<String> purchased = SQLUtils.deserializeList(set.getString("Purchased"));

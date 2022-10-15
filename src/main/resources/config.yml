@@ -46,6 +46,8 @@ other:
   close_on_buy: true
   # Should an announcement be sent when shops have rotated?
   rotate_announcement: true
+  # Should NightMarket check SpigotMC daily for updates?
+  update: true
 
 # Configuration for all the items that this plugin chooses from. Items will be randomly selected for players' shops based on their rarity.
 # > Higher the rarity, the more common.

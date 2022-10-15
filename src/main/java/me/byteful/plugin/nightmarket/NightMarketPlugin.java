@@ -11,15 +11,23 @@ import me.byteful.plugin.nightmarket.schedule.access.AccessScheduleManager;
 import me.byteful.plugin.nightmarket.schedule.rotate.RotateScheduleManager;
 import me.byteful.plugin.nightmarket.shop.item.ShopItemRegistry;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShopManager;
+import me.byteful.plugin.nightmarket.util.UpdateChecker;
 import me.byteful.plugin.nightmarket.util.dependency.IsolatedClassLoader;
 import me.byteful.plugin.nightmarket.util.dependency.LibraryLoader;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.scheduler.BukkitTask;
 import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 public final class NightMarketPlugin extends JavaPlugin {
+  private final UpdateChecker updateChecker = new UpdateChecker(this);
+
   private CurrencyRegistry currencyRegistry;
   private DataStoreProvider dataStoreProvider;
   private PlayerShopManager playerShopManager;
@@ -28,6 +36,7 @@ public final class NightMarketPlugin extends JavaPlugin {
   private ShopItemRegistry shopItemRegistry;
   private GUIParser.ParsedGUI parsedGUI;
   private Messages messages;
+  private BukkitTask updateCheckingTask;
 
   @Override
   public void onEnable() {
@@ -48,8 +57,21 @@ public final class NightMarketPlugin extends JavaPlugin {
     reloadShopItems();
     getLogger().info("Loaded shop items...");
     loadDataStore();
+    reloadUpdateChecker();
 
     new CommandParser(getResource("commands.rdcml")).parse().register(this, "nightmarket", new CommandHooks(this));
+    new NightMarketPlaceholders(this).register();
+  }
+
+  void reloadUpdateChecker() {
+    if (updateCheckingTask != null) {
+      updateCheckingTask.cancel();
+      updateCheckingTask = null;
+    }
+
+    if (getConfig().getBoolean("other.update")) {
+      updateCheckingTask = Bukkit.getScheduler().runTaskTimer(this, () -> updateChecker.check(), 0L, 20L * TimeUnit.DAYS.toSeconds(1));
+    }
   }
 
   void loadDataStore() {
@@ -65,7 +87,7 @@ public final class NightMarketPlugin extends JavaPlugin {
 
       case "mongo":
       case "mongodb": {
-        LibraryLoader.load(this, "org.mongodb", "mongo-java-driver", "3.12.11");
+        LibraryLoader.loadWithInject(this, "org.mongodb", "mongo-java-driver", "3.12.11");
         dataStoreProvider = new MongoDataStoreProvider(this);
         getLogger().info("Detected data store type: MongoDB-remote");
 
@@ -131,8 +153,8 @@ public final class NightMarketPlugin extends JavaPlugin {
     return parsedGUI;
   }
 
-  public Messages getMessages() {
-    return messages;
+  public String getMessage(Player context, String key) {
+    return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI") && context != null ? PlaceholderAPI.setPlaceholders(context, messages.get(key)) : messages.get(key);
   }
 
   void reloadMessages() {
@@ -157,5 +179,9 @@ public final class NightMarketPlugin extends JavaPlugin {
 
   void reloadCurrencyManager() {
     currencyRegistry = new CurrencyRegistry(this);
+  }
+
+  public UpdateChecker getUpdateChecker() {
+    return updateChecker;
   }
 }

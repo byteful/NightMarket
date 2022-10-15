@@ -29,20 +29,21 @@ repositories {
         name = 'placeholder-api'
         url = 'https://repo.extendedclip.com/content/repositories/placeholderapi/'
     }
-    maven {
-        name = 'lucko'
-        url = "https://repo.lucko.me/"
-    }
 }
 
 dependencies {
+    // Spigot libs
     compileOnly 'org.spigotmc:spigot-api:1.13.2-R0.1-SNAPSHOT'
-    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
+
+    // Helper libs
     implementation 'com.github.cryptomorin:XSeries:9.1.0'
     implementation 'com.github.Redempt:RedLib:6.5.8'
-    //implementation 'me.lucko:helper:5.6.13'
+
+    // External plugin libs
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
     compileOnly 'me.clip:placeholderapi:2.11.2'
 
+    // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
     compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
     compileOnly 'mysql:mysql-connector-java:8.0.30'
     compileOnly 'org.xerial:sqlite-jdbc:3.39.3.0'
@@ -79,16 +80,5 @@ shadowJar {
     archiveClassifier.set("")
 
     relocate 'com.cryptomorin.xseries', 'me.byteful.plugin.nightmarket.libs.xseries'
-//    relocate 'com.mongodb', 'me.byteful.plugin.nightmarket.libs.mongo'
-//    relocate 'org.bson', 'me.byteful.plugin.nightmarket.libs.bson'
-//    relocate 'com.mysql', 'me.byteful.plugin.nightmarket.libs.mysql'
-//    relocate ('org.sqlite', 'me.byteful.plugin.nightmarket.libs.sqlite') {
-//        exclude 'org.sqlite.core.NativeDB'
-//        exclude 'org.sqlite.Collation'
-//        exclude 'org.sqlite.Function$Window'
-//        exclude 'org.sqlite.core.DB$ProgressObserver'
-//        exclude 'org.sqlite.ProgressHandler'
-//    }
     relocate 'redempt', 'me.byteful.plugin.nightmarket.libs.redempt'
-    //relocate 'me.lucko', 'me.byteful.plugin.nightmarket.libs.lucko'
 }

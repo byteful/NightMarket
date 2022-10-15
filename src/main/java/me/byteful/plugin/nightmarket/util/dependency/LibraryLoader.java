@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-// Much of this code was borrowed from lucko's helper library.
+// Much of this code was borrowed from lucko's helper library. Adapted by byteful to support isolated class loaders.
 public final class LibraryLoader {
   private static final Supplier<URLClassLoaderAccess> URL_INJECTOR = Suppliers.memoize(() -> URLClassLoaderAccess.create((URLClassLoader) NightMarketPlugin.class.getClassLoader()));
 
@@ -63,7 +63,7 @@ public final class LibraryLoader {
   }
 
   private static void download(NightMarketPlugin plugin, Dependency d, File saveLocation, String name) {
-    plugin.getLogger().info(String.format("Loading dependency %s:%s:%s...", d.getGroupId(), d.getArtifactId(), d.getVersion()));
+    plugin.getLogger().info(String.format("Loading dependency '%s:%s:%s'...", d.getGroupId(), d.getArtifactId(), d.getVersion()));
 
     if (!saveLocation.exists()) {
       try {
