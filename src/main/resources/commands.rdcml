@@ -2,6 +2,7 @@ nightmarket,nmarket,nightm {
     hook open
     help Opens the NightMarket GUI.
     user player
+    permission nightmarket.use
 }
 
 nightmarketadmin,adminnightmarket,nmarketadmin,nightmarket-admin {

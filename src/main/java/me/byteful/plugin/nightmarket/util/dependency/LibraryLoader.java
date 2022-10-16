@@ -1,5 +1,6 @@
 package me.byteful.plugin.nightmarket.util.dependency;
 
+import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 
@@ -10,7 +11,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
 import java.util.Objects;
-import java.util.function.Supplier;
 
 // Much of this code was borrowed from lucko's helper library. Adapted by byteful to support isolated class loaders.
 public final class LibraryLoader {

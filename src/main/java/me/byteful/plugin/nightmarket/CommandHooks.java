@@ -62,6 +62,9 @@ public class CommandHooks {
     sender.sendMessage("- Plugin Version: " + plugin.getDescription().getVersion());
     sender.sendMessage("- Latest Version: " + plugin.getUpdateChecker().getLastCheckedVersion());
     sender.sendMessage("- DataStore Type: " + plugin.getDataStoreProvider().getClass().getSimpleName());
+    sender.sendMessage("- Buyer: %%__USER__%%");
+    sender.sendMessage("- Resource ID: %%__RESOURCE__%%");
+    sender.sendMessage("- MC-Market?: %%__BUILTBYBIT__%%");
     sender.sendMessage("{!} Please include your configuration with this when asking for help. You MAY OMIT credentials. Please COPY AND PASTE configuration into discord server. {!}");
   }
 }

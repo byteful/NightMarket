@@ -5,9 +5,9 @@ import me.byteful.plugin.nightmarket.shop.item.ShopItemRegistry;
 import me.byteful.plugin.nightmarket.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import redempt.redlib.misc.WeightedRandom;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class PlayerShop {
   private final UUID uniqueId;
@@ -57,14 +57,17 @@ public class PlayerShop {
 
   private List<String> generateRandomShop(ShopItemRegistry registry) {
     final int maxItems = registry.getMaxItems();
-    final List<ShopItem> items = new ArrayList<>(registry.getAll());
-    if (items.size() < maxItems) {
-      throw new RuntimeException("There are not enough items to generate shops! You need more items than setup in the GUI!");
+    if (registry.getAll().size() < maxItems) {
+      throw new RuntimeException("There are not enough items to generate shops! You need more items than slots in the GUI!");
     }
+
+    final WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(registry.getAll(), x -> x, ShopItem::getRarity);
 
     final List<String> generated = new ArrayList<>();
     for (int i = 0; i < maxItems; i++) {
-      generated.add(items.remove(ThreadLocalRandom.current().nextInt(items.size())).getId());
+      final ShopItem item = random.roll();
+      random.remove(item);
+      generated.add(item.getId());
     }
 
     return generated;

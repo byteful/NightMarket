@@ -12,12 +12,13 @@ public class ShopItemParser {
     final String command = config.getString("command");
     final boolean multiplePurchase = config.getBoolean("multiple_purchase");
     final double amount = config.getDouble("price.amount");
+    final double rarity = config.getDouble("rarity");
     final Currency currency = registry.get(config.getString("price.currency"));
 
     if (config.getName().contains(",")) {
-      throw new RuntimeException("Item config '" + config.getName() + "' CANNOT contain ',' characters.");
+      throw new RuntimeException("Item config '" + config.getName() + "' id/name CANNOT contain ',' characters.");
     }
 
-    return new ShopItem(config.getName(), icon, command, currency, amount, multiplePurchase);
+    return new ShopItem(config.getName(), icon, command, currency, amount, rarity, multiplePurchase);
   }
 }

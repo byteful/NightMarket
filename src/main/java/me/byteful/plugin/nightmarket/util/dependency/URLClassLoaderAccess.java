@@ -9,6 +9,7 @@ import java.util.Collection;
 /**
  * Provides access to {@link URLClassLoader}#addURL.
  */
+// Brought from lucko's helper library.
 public abstract class URLClassLoaderAccess {
 
   private final URLClassLoader classLoader;

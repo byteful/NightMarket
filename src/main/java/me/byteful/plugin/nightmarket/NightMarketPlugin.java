@@ -78,8 +78,9 @@ public final class NightMarketPlugin extends JavaPlugin {
     switch (getConfig().getString("datastore.type").toLowerCase().trim().replace(" ", "_")) {
       case "mysql":
       case "mariadb": {
-        final IsolatedClassLoader loader = LibraryLoader.load(this, "mysql", "mysql-connector-java", "8.0.30");
-        dataStoreProvider = new MySQLDataStoreProvider(loader, this);
+        //final IsolatedClassLoader loader = LibraryLoader.load(this, "mysql", "mysql-connector-java", "8.0.30");
+        LibraryLoader.loadWithInject(this, "mysql", "mysql-connector-java", "8.0.30");
+        dataStoreProvider = new MySQLDataStoreProvider(this);
         getLogger().info("Detected data store type: MySQL-remote");
 
         break;

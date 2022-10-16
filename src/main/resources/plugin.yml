@@ -8,3 +8,6 @@ description: A plugin that brings a limited-access, rotating shop to Minecraft. 
 permissions:
   nightmarket.admin:
     description: "Permission to use all NightMarket admin commands."
+  nightmarket.use:
+    description: "Permission to use /nightmarket"
+    default: true

@@ -11,14 +11,16 @@ public class ShopItem {
   private final String command;
   private final Currency currency;
   private final double amount;
+  private final double rarity;
   private final boolean isMultiplePurchase;
 
-  public ShopItem(String id, ItemStack icon, String command, Currency currency, double amount, boolean isMultiplePurchase) {
+  public ShopItem(String id, ItemStack icon, String command, Currency currency, double amount, double rarity, boolean isMultiplePurchase) {
     this.id = id;
     this.icon = icon;
     this.command = command;
     this.currency = currency;
     this.amount = amount;
+    this.rarity = rarity;
     this.isMultiplePurchase = isMultiplePurchase;
   }
 
@@ -46,17 +48,21 @@ public class ShopItem {
     return isMultiplePurchase;
   }
 
+  public double getRarity() {
+    return rarity;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ShopItem shopItem = (ShopItem) o;
-    return Double.compare(shopItem.amount, amount) == 0 && isMultiplePurchase == shopItem.isMultiplePurchase && Objects.equals(id, shopItem.id) && Objects.equals(icon, shopItem.icon) && Objects.equals(command, shopItem.command) && Objects.equals(currency, shopItem.currency);
+    return Double.compare(shopItem.amount, amount) == 0 && Double.compare(shopItem.rarity, rarity) == 0 && isMultiplePurchase == shopItem.isMultiplePurchase && Objects.equals(id, shopItem.id) && Objects.equals(icon, shopItem.icon) && Objects.equals(command, shopItem.command) && Objects.equals(currency, shopItem.currency);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, icon, command, currency, amount, isMultiplePurchase);
+    return Objects.hash(id, icon, command, currency, amount, rarity, isMultiplePurchase);
   }
 
   @Override
@@ -67,6 +73,7 @@ public class ShopItem {
       ", command='" + command + '\'' +
       ", currency=" + currency +
       ", amount=" + amount +
+      ", rarity=" + rarity +
       ", isMultiplePurchase=" + isMultiplePurchase +
       '}';
   }
