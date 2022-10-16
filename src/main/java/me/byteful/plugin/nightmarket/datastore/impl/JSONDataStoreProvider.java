@@ -18,13 +18,23 @@ public class JSONDataStoreProvider implements DataStoreProvider {
 
   public JSONDataStoreProvider(NightMarketPlugin plugin) {
     this.file = new File(plugin.getDataFolder(), "data.json");
-    try {
-      this.data = DataStoreProvider.GSON.fromJson(new String(Files.readAllBytes(this.file.toPath()), StandardCharsets.UTF_8), JsonObject.class);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    if (!this.file.exists()) {
+      try {
+        this.file.createNewFile();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      this.data = new JsonObject();
+    } else {
+      try {
+        this.data = DataStoreProvider.GSON.fromJson(new String(Files.readAllBytes(this.file.toPath()), StandardCharsets.UTF_8), JsonObject.class);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
-    if (!data.has("shops")) {
-      data.add("shops", new JsonObject());
+    if (!this.data.has("shops")) {
+      this.data.add("shops", new JsonObject());
     }
   }
 

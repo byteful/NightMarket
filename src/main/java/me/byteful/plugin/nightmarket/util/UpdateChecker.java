@@ -26,9 +26,16 @@ public final class UpdateChecker {
   public void check() {
     plugin.getLogger().info("Checking for updates...");
     final String resourceId = "%%__RESOURCE__%%";
+    final String isBuiltByBit = "%%__BUILTBYBIT__%%";
+
+    if (isBuiltByBit.equalsIgnoreCase("true")) {
+      plugin.getLogger().info("Update checks are not supported with BuiltByBit/MC-Market downloads.");
+
+      return;
+    }
 
     if (resourceId.startsWith("%")) {
-      plugin.getLogger().info("Update check was cancelled because you are not using a build from SpigotMC!");
+      plugin.getLogger().info("Update check was cancelled because you are not using a purchased plugin JAR!");
 
       return;
     }
