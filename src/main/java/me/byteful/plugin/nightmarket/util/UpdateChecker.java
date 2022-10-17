@@ -28,12 +28,6 @@ public final class UpdateChecker {
     final String resourceId = "%%__RESOURCE__%%";
     final String isBuiltByBit = "%%__BUILTBYBIT__%%";
 
-    if (isBuiltByBit.equalsIgnoreCase("true")) {
-      plugin.getLogger().info("Update checks are not supported with BuiltByBit/MC-Market downloads.");
-
-      return;
-    }
-
     if (resourceId.startsWith("%")) {
       plugin.getLogger().info("Update check was cancelled because you are not using a purchased plugin JAR!");
 
@@ -48,7 +42,7 @@ public final class UpdateChecker {
     }
 
     Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-      try (final InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId).openStream(); final Scanner scanner = new Scanner(inputStream)) {
+      try (final InputStream inputStream = new URL("https://api.byteful.me/nightmarket").openStream(); final Scanner scanner = new Scanner(inputStream)) {
         if (!scanner.hasNext()) {
           return;
         }
@@ -59,7 +53,8 @@ public final class UpdateChecker {
           plugin.getLogger().info("No new updates found.");
         } else {
           plugin.getLogger().info("A new update was found. You are on " + currentVersion + " while the latest version is " + latestVersion + ".");
-          plugin.getLogger().info("Please install this update from: https://www.spigotmc.org/resources/" + resourceId);
+          final String downloadUrl = isBuiltByBit.equalsIgnoreCase("true") ? "https://builtbybit.com/resources/" + resourceId : "https://www.spigotmc.org/resources/" + resourceId;
+          plugin.getLogger().info("Please install this update from: " + downloadUrl);
         }
 
         lastCheckedVersion = latestVersion;
