@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.0.5'
+version = '1.0.6-BETA'
 
 repositories {
     mavenCentral()
@@ -46,7 +46,7 @@ dependencies {
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
     compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
     compileOnly 'mysql:mysql-connector-java:8.0.30'
-    compileOnly 'org.xerial:sqlite-jdbc:3.39.3.0'
+    compileOnly 'org.xerial:sqlite-jdbc:3.39.4.1'
 }
 
 def targetJavaVersion = 8
