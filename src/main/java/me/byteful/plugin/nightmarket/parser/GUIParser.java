@@ -10,6 +10,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.inventorygui.ItemButton;
+import redempt.redlib.misc.WeightedRandom;
 
 import java.util.List;
 
@@ -61,6 +62,25 @@ public class GUIParser {
       List<String> items = player.getShopItems();
       if (items.size() > itemSlots.size()) {
         items = items.subList(0, itemSlots.size());
+      }
+      boolean changed = items.removeIf(x -> plugin.getShopItemRegistry().get(x) == null);
+      if (items.size() < itemSlots.size()) {
+        final int diff = itemSlots.size() - items.size();
+        final WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(plugin.getShopItemRegistry().getAll(), x -> x, ShopItem::getRarity);
+        items.forEach(x -> random.remove(plugin.getShopItemRegistry().get(x)));
+        if (random.getWeights().size() < diff) {
+          throw new RuntimeException("There are not enough items to generate shops! You need more items than slots in the GUI!");
+        }
+        for (int i = 0; i < diff; i++) {
+          final ShopItem item = random.roll();
+          random.remove(item);
+          items.add(item.getId());
+        }
+        changed = true;
+      }
+
+      if (changed) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDataStoreProvider().setPlayerShop(player));
       }
       for (int i = 0; i < itemSlots.size(); i++) {
         final Integer slot = itemSlots.get(i);
