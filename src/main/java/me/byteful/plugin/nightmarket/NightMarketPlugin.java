@@ -105,7 +105,7 @@ public final class NightMarketPlugin extends JavaPlugin {
 
       case "sqlite":
       case "flatfile": {
-        final IsolatedClassLoader loader = LibraryLoader.load(this, "org.xerial", "sqlite-jdbc", "3.39.3.0");
+        final IsolatedClassLoader loader = LibraryLoader.load(this, "org.xerial", "sqlite-jdbc", "3.39.4.1");
         dataStoreProvider = new SQLiteDataStoreProvider(loader, this);
         getLogger().info("Detected data store type: SQLite-file");
 

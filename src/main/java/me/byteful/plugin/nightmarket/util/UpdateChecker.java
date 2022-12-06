@@ -27,16 +27,16 @@ public final class UpdateChecker {
     plugin.getLogger().info("Checking for updates...");
     final String resourceId = "%%__RESOURCE__%%";
     final String isBuiltByBit = "%%__BUILTBYBIT__%%";
+    final String currentVersion = plugin.getDescription().getVersion();
 
-    if (resourceId.startsWith("%")) {
-      plugin.getLogger().info("Update check was cancelled because you are not using a purchased plugin JAR!");
+    if (currentVersion.contains("BETA")) {
+      plugin.getLogger().info("Update check was cancelled because you are running a beta build!");
 
       return;
     }
 
-    final String currentVersion = plugin.getDescription().getVersion();
-    if (currentVersion.contains("BETA")) {
-      plugin.getLogger().info("Update check was cancelled because you are running a beta build!");
+    if (resourceId.startsWith("%")) {
+      plugin.getLogger().info("Update check was cancelled because you are not using a purchased plugin JAR!");
 
       return;
     }

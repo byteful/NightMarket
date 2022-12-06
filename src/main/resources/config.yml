@@ -76,6 +76,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -90,6 +91,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -104,6 +106,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -118,6 +121,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -132,6 +136,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -146,6 +151,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -160,6 +166,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello u can buy this one multiple times"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -174,6 +181,7 @@ items:
       lore: # The lore of the icon displayed in the shop.
         - "hello"
         - "&6Price: 6.90"
+      custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
