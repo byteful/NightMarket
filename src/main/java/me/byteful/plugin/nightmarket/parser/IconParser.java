@@ -60,7 +60,7 @@ public class IconParser {
   private static void applyMeta(String name, List<String> lore, Integer customModelData, ItemMeta meta) {
     meta.setDisplayName(color(name));
     meta.setLore(lore == null || lore.isEmpty() ? null : color(lore));
-    if (RedLib.MID_VERSION >= 14) {
+    if (customModelData != null && RedLib.MID_VERSION >= 14) {
       meta.setCustomModelData(customModelData);
     }
   }
