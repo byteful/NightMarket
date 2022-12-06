@@ -80,6 +80,16 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
     return set;
   }
 
+  @Override
+  public boolean test() {
+    try {
+      return !connection.isClosed() && connection.isValid(5);
+    } catch (SQLException e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
   private void createTable() {
     final String sql = "CREATE TABLE IF NOT EXISTS NightMarket (ID BINARY(16) NOT NULL, Purchased TEXT NOT NULL, Items TEXT NOT NULL, PRIMARY KEY (ID));";
 

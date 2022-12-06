@@ -17,4 +17,6 @@ public interface DataStoreProvider extends Closeable {
   Optional<PlayerShop> getPlayerShop(UUID player);
 
   Set<PlayerShop> getAllShops();
+
+  boolean test();
 }

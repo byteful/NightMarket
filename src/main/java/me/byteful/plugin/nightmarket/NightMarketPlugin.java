@@ -70,7 +70,7 @@ public final class NightMarketPlugin extends JavaPlugin {
     }
 
     if (getConfig().getBoolean("other.update")) {
-      updateCheckingTask = Bukkit.getScheduler().runTaskTimer(this, () -> updateChecker.check(), 0L, 20L * TimeUnit.DAYS.toSeconds(1));
+      updateCheckingTask = Bukkit.getScheduler().runTaskTimer(this, updateChecker::check, 0L, 20L * TimeUnit.DAYS.toSeconds(1));
     }
   }
 
@@ -111,6 +111,13 @@ public final class NightMarketPlugin extends JavaPlugin {
 
         break;
       }
+    }
+
+    if (!dataStoreProvider.test()) {
+      getLogger().info("Failed DataStore testing... Plugin shutting down.");
+      Bukkit.getPluginManager().disablePlugin(this);
+
+      return;
     }
 
     getLogger().info("Loaded data store...");

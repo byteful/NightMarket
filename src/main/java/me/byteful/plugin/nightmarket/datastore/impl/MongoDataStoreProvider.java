@@ -62,6 +62,17 @@ public class MongoDataStoreProvider implements DataStoreProvider {
     return set;
   }
 
+  @Override
+  public boolean test() {
+    try {
+      getCollection();
+      return true;
+    } catch (Exception e) {
+      e.printStackTrace();
+      return false;
+    }
+  }
+
   private MongoCollection<Document> getCollection() {
     return db.getCollection("NightMarket");
   }

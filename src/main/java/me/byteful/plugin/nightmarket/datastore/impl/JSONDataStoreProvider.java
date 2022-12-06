@@ -65,6 +65,11 @@ public class JSONDataStoreProvider implements DataStoreProvider {
     return set;
   }
 
+  @Override
+  public boolean test() {
+    return file != null && data != null && data.has("shops");
+  }
+
   private void save() {
     try {
       Files.write(file.toPath(), DataStoreProvider.GSON.toJson(data).getBytes(StandardCharsets.UTF_8));
