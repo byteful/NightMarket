@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.0.6'
+version = '1.0.7-BETA'
 
 repositories {
     mavenCentral()
@@ -36,7 +36,7 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.14.2-R0.1-SNAPSHOT'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:9.1.0'
+    implementation 'com.github.cryptomorin:XSeries:9.3.1'
     implementation 'com.github.Redempt:RedLib:6.5.8'
 
     // External plugin libs

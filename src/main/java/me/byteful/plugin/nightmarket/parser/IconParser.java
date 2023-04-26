@@ -28,7 +28,7 @@ public class IconParser {
     if (mat == null && head != null) {
       return parseHead(name, lore, head, customModelData);
     } else if (mat != null) {
-      final ItemStack material = XMaterial.matchXMaterial(mat).orElseThrow(RuntimeException::new).parseItem();
+      final ItemStack material = XMaterial.matchXMaterial(mat).orElseThrow(() -> new RuntimeException("Failed to parse material: " + mat)).parseItem();
       Preconditions.checkNotNull(material, "Failed to parse material: " + mat);
       Preconditions.checkArgument(material.getType() != Material.AIR, "Material cannot be AIR!");
       return parseMaterial(name, lore, material, customModelData);
