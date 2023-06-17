@@ -7,18 +7,22 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 
 public class ShopItemParser {
-  public static ShopItem parse(CurrencyRegistry registry, ConfigurationSection config) {
-    final ItemStack icon = IconParser.parse(config.getConfigurationSection("icon"));
-    final String command = config.getString("command");
-    final boolean multiplePurchase = config.getBoolean("multiple_purchase");
-    final double amount = config.getDouble("price.amount");
-    final double rarity = config.getDouble("rarity");
-    final Currency currency = registry.get(config.getString("price.currency"));
+    public static ShopItem parse(CurrencyRegistry registry, ConfigurationSection config) {
+        final ItemStack icon = IconParser.parse(config.getConfigurationSection("icon"));
+        final String command = config.getString("command");
+        final boolean multiplePurchase = config.getBoolean("multiple_purchase");
+        final double amount = config.getDouble("price.amount");
+        final double rarity = config.getDouble("rarity");
+        final Currency currency = registry.get(config.getString("price.currency"));
 
-    if (config.getName().contains(",")) {
-      throw new RuntimeException("Item config '" + config.getName() + "' id/name CANNOT contain ',' characters.");
+        if (config.getName().contains(",")) {
+            throw new RuntimeException("Item config '" + config.getName() + "' id/name CANNOT contain ',' characters.");
+        }
+
+        if (currency == null || !currency.canLoad()) {
+            throw new RuntimeException("Failed to find a valid currency adapter for: " + config.getString("price.currency"));
+        }
+
+        return new ShopItem(config.getName(), icon, command, currency, amount, rarity, multiplePurchase);
     }
-
-    return new ShopItem(config.getName(), icon, command, currency, amount, rarity, multiplePurchase);
-  }
 }

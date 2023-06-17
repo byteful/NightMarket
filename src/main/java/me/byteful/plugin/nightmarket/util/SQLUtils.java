@@ -7,25 +7,25 @@ import java.util.List;
 import java.util.UUID;
 
 public class SQLUtils {
-  public static byte[] serializeUUID(UUID uuid) {
-    final ByteBuffer buffer = ByteBuffer.allocate(16);
-    buffer.putLong(uuid.getMostSignificantBits());
-    buffer.putLong(uuid.getLeastSignificantBits());
+    public static byte[] serializeUUID(UUID uuid) {
+        final ByteBuffer buffer = ByteBuffer.allocate(16);
+        buffer.putLong(uuid.getMostSignificantBits());
+        buffer.putLong(uuid.getLeastSignificantBits());
 
-    return buffer.array();
-  }
+        return buffer.array();
+    }
 
-  public static UUID deserializeUUID(byte[] data) {
-    final ByteBuffer buffer = ByteBuffer.wrap(data);
+    public static UUID deserializeUUID(byte[] data) {
+        final ByteBuffer buffer = ByteBuffer.wrap(data);
 
-    return new UUID(buffer.getLong(), buffer.getLong());
-  }
+        return new UUID(buffer.getLong(), buffer.getLong());
+    }
 
-  public static String serializeList(List<String> list) {
-    return String.join(",", list);
-  }
+    public static String serializeList(List<String> list) {
+        return String.join(",", list);
+    }
 
-  public static List<String> deserializeList(String data) {
-    return new ArrayList<>(Arrays.asList(data.split(",")));
-  }
+    public static List<String> deserializeList(String data) {
+        return new ArrayList<>(Arrays.asList(data.split(",")));
+    }
 }
