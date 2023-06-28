@@ -27,15 +27,15 @@ public class CurrencyRegistry {
     }
 
     public Currency get(String id) {
-        return currencies.get(id);
+        return currencies.get(id.toLowerCase());
     }
 
     public void register(Currency currency) {
-        currencies.put(currency.getId(), currency);
+        currencies.put(currency.getId().toLowerCase(), currency);
     }
 
     public void unregister(String id) {
-        currencies.remove(id);
+        currencies.remove(id.toLowerCase());
     }
 
     public Map<String, Currency> getCurrencies() {
