@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.0.8'
+version = '1.0.9'
 
 repositories {
     mavenCentral()
@@ -36,17 +36,17 @@ dependencies {
     compileOnly 'org.spigotmc:spigot-api:1.20.1-R0.1-SNAPSHOT'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:9.3.1'
+    implementation 'com.github.cryptomorin:XSeries:9.4.0'
     implementation 'com.github.Redempt:RedLib:6.5.8'
 
     // External plugin libs
-    compileOnly 'com.github.MilkBowl:VaultAPI:1.7'
-    compileOnly 'me.clip:placeholderapi:2.11.2'
+    compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
+    compileOnly 'me.clip:placeholderapi:2.11.3'
 
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
-    compileOnly 'org.mongodb:mongo-java-driver:3.12.11'
-    compileOnly 'mysql:mysql-connector-java:8.0.30'
-    compileOnly 'org.xerial:sqlite-jdbc:3.39.4.1'
+    compileOnly 'org.mongodb:mongo-java-driver:3.12.14'
+    compileOnly 'com.mysql:mysql-connector-j:8.0.33'
+    compileOnly 'org.xerial:sqlite-jdbc:3.42.0.0'
 }
 
 def targetJavaVersion = 8

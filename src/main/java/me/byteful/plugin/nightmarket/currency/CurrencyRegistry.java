@@ -16,6 +16,8 @@ public class CurrencyRegistry {
                 if (currency.canLoad()) {
                     currency.load();
                     register(currency);
+                } else {
+                    plugin.getLogger().warning("Failed to load currency: " + currency.getId());
                 }
             } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
                      NoSuchMethodException | ClassNotFoundException e) {
@@ -25,10 +27,18 @@ public class CurrencyRegistry {
     }
 
     public Currency get(String id) {
-        return currencies.get(id.toLowerCase().trim().replace(" ", "_"));
+        return currencies.get(id);
     }
 
     public void register(Currency currency) {
         currencies.put(currency.getId(), currency);
+    }
+
+    public void unregister(String id) {
+        currencies.remove(id);
+    }
+
+    public Map<String, Currency> getCurrencies() {
+        return currencies;
     }
 }

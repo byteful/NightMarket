@@ -52,19 +52,19 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
 
         switch (params.toLowerCase().trim().replace(" ", "_")) {
             case "purchased_items_count": {
-                return "" + shop.getPurchasedShopItems().size();
+                return String.valueOf(shop.getPurchasedShopItems().size());
             }
 
             case "available_items_count": {
-                return "" + shop.getShopItems().size();
+                return String.valueOf(shop.getShopItems().size());
             }
 
             case "rotate": {
-                return "" + plugin.getRotateScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
+                return plugin.getRotateScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
             }
 
             case "open": {
-                return "" + plugin.getAccessScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
+                return plugin.getAccessScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
             }
 
             default: {

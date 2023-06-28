@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class Text {
     public static String color(String str) {
-        return FormatUtils.color(str);
+        return FormatUtils.color(str, true);
     }
 
     public static List<String> color(List<String> list) {
