@@ -14,16 +14,6 @@ public class SQLiteDataStoreProvider extends SQLDataStoreProvider {
     }
 
     private static Connection buildConnection(IsolatedClassLoader loader, Path path) {
-//    try {
-//      final Properties properties = new Properties();
-//      properties.setProperty("foreign_keys", "on");
-//      properties.setProperty("busy_timeout", "1000");
-//
-//      return JDBC.createConnection("jdbc:sqlite:" + path, properties);
-//    } catch (Exception e) {
-//      throw new RuntimeException(e);
-//    }
-
         try {
             final Class<?> connectionClass = loader.loadClass("org.sqlite.jdbc4.JDBC4Connection");
             final Properties properties = new Properties();

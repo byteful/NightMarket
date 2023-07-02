@@ -64,7 +64,7 @@ public class MongoDataStoreProvider implements DataStoreProvider {
     @Override
     public boolean test() {
         try {
-            getCollection();
+            getCollection().find(Filters.eq("test", "test")).first();
             return true;
         } catch (Exception e) {
             e.printStackTrace();

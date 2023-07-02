@@ -30,6 +30,12 @@ public class PlayerShop {
     private static Map<String, Integer> deserializePurchased(List<String> list) {
         final Map<String, Integer> map = new HashMap<>();
         for (String data : list) {
+            if (!data.contains(":")) {
+                map.put(data, 1); // Old data structure, lets not cause any problems and just fix this later during save :)
+
+                continue;
+            }
+
             final String[] split = data.split(":");
             map.put(split[0], Integer.parseInt(split[1]));
         }
