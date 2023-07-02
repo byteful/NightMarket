@@ -1,29 +1,33 @@
 package me.byteful.plugin.nightmarket.currency;
 
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
+import me.byteful.plugin.nightmarket.currency.impl.PlayerPointsCurrency;
+import me.byteful.plugin.nightmarket.currency.impl.VaultCurrency;
+import org.bukkit.Bukkit;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CurrencyRegistry {
     private final Map<String, Currency> currencies = new HashMap<>();
+    private final NightMarketPlugin plugin;
+    private boolean isLoaded = false;
 
     public CurrencyRegistry(NightMarketPlugin plugin) {
-        for (String className : plugin.getConfig().getStringList("currencies")) {
-            try {
-                final Currency currency = (Currency) Class.forName(className).getDeclaredConstructor().newInstance();
-                if (currency.canLoad()) {
-                    currency.load();
-                    register(currency);
-                } else {
-                    plugin.getLogger().warning("Failed to load currency: " + currency.getId());
-                }
-            } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
-                     NoSuchMethodException | ClassNotFoundException e) {
-                e.printStackTrace();
-            }
-        }
+        this.plugin = plugin;
+        Bukkit.getScheduler().runTaskLater(plugin, this::load, 20L);
+    }
+
+    private void load() {
+        plugin.getLogger().info("Loading NightMarket currency adapters...");
+        // Let other external plugins know. We delay by a second loading these so other plugins get a chance to handle this and depend on NightMarket properly.
+        Bukkit.getPluginManager().callEvent(new CurrencyRegisterEvent(this));
+
+        register(new VaultCurrency());
+        register(new PlayerPointsCurrency());
+
+        isLoaded = true;
+        plugin.getLogger().info("Done loading currencies!");
     }
 
     public Currency get(String id) {
@@ -31,7 +35,15 @@ public class CurrencyRegistry {
     }
 
     public void register(Currency currency) {
+        if (currency.canLoad()) {
+            currency.load();
+        }
+
         currencies.put(currency.getId().toLowerCase(), currency);
+    }
+
+    public void unregister(Currency currency) {
+        unregister(currency.getId());
     }
 
     public void unregister(String id) {
@@ -40,5 +52,9 @@ public class CurrencyRegistry {
 
     public Map<String, Currency> getCurrencies() {
         return currencies;
+    }
+
+    public boolean isLoaded() {
+        return isLoaded;
     }
 }

@@ -2,7 +2,7 @@
 # NightMarket v${version} by byteful#0001
 #
 
-# Attention! Support will not be given to those who have not purchased this plugin through SpigotMC.
+# Attention! Support will not be given to those who have not purchased this plugin through SpigotMC/MC-Market.
 
 # [-----------------------------------------------------------------------------------------------]
 #
@@ -14,10 +14,6 @@
 # With text/messages, color codes, hex codes, and PlaceholderAPI (in some instances) is supported.
 #
 # [-----------------------------------------------------------------------------------------------]
-
-# Configuration for currency implementations. Use this with external dependencies to add their currency managers in.
-currencies:
-  - "me.byteful.plugin.nightmarket.currency.impl.VaultCurrency"
 
 # Configuration for the data store used to store players' current shop rotation. Remote databases are supported for cross-server night markets.
 # > Types:
@@ -80,7 +76,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -95,8 +91,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: false # Can this item be purchased multiple times by the same player?
-    rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount    rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
       amount: 6.9 # The actual amount of currency the item costs.
@@ -110,7 +105,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -125,7 +120,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -140,7 +135,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -155,7 +150,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -170,7 +165,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: true # Can this item be purchased multiple times by the same player?
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -185,7 +180,7 @@ items:
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    multiple_purchase: false # Can this item be purchased multiple times by the same player?
+    purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.

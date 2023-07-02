@@ -55,7 +55,7 @@ public class GUIParser {
         public InventoryGUI build(PlayerShop player, NightMarketPlugin plugin) {
             plugin.debug("Building NightMarket GUI for: " + player.getUniqueId());
             plugin.debug("Items list: " + String.join(",", player.getShopItems()));
-            plugin.debug("Purchased items list: " + String.join(",", player.getPurchasedShopItems()));
+            plugin.debug("Purchased items list: " + String.join(",", player.getPurchasedShopItems().keySet()));
             final InventoryGUI gui = new InventoryGUI(rows * 9, getTitle());
             final ItemButton bgButton = ItemButton.create(backgroundItem, (e) -> {
             });
@@ -103,7 +103,7 @@ public class GUIParser {
                         return;
                     }
 
-                    if (!item.isMultiplePurchase() && player.hasPurchasedItem(item.getId())) {
+                    if (player.getPurchaseCount(item.getId()) >= item.getPurchaseLimit()) {
                         e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "already_purchased"));
                         e.getWhoClicked().closeInventory();
 

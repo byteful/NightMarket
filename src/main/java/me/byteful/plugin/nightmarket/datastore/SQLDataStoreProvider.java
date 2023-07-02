@@ -25,11 +25,14 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
         final String sql = "INSERT INTO NightMarket (ID, Purchased, Items) VALUES (?, ?, ?) " + upsertClause + " Purchased=?, Items=?;";
 
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            final List<String> purchased = shop.getSerializedPurchasedShopItems();
+            final List<String> items = shop.getShopItems();
+
             statement.setBytes(1, SQLUtils.serializeUUID(shop.getUniqueId()));
-            statement.setString(2, SQLUtils.serializeList(new ArrayList<>(shop.getPurchasedShopItems())));
-            statement.setString(3, SQLUtils.serializeList(shop.getShopItems()));
-            statement.setString(4, SQLUtils.serializeList(new ArrayList<>(shop.getPurchasedShopItems())));
-            statement.setString(5, SQLUtils.serializeList(shop.getShopItems()));
+            statement.setString(2, SQLUtils.serializeList(purchased));
+            statement.setString(3, SQLUtils.serializeList(items));
+            statement.setString(4, SQLUtils.serializeList(purchased));
+            statement.setString(5, SQLUtils.serializeList(items));
 
             statement.execute();
         } catch (SQLException ex) {
@@ -51,7 +54,7 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
                 final List<String> purchased = SQLUtils.deserializeList(set.getString("Purchased"));
                 final List<String> items = SQLUtils.deserializeList(set.getString("Items"));
 
-                return Optional.of(new PlayerShop(player, new HashSet<>(purchased), items));
+                return Optional.of(new PlayerShop(player, purchased, items));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -71,7 +74,7 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
                 final List<String> purchased = SQLUtils.deserializeList(result.getString("Purchased"));
                 final List<String> items = SQLUtils.deserializeList(result.getString("Items"));
 
-                set.add(new PlayerShop(uuid, new HashSet<>(purchased), items));
+                set.add(new PlayerShop(uuid, purchased, items));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

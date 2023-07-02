@@ -2,7 +2,7 @@ name: NightMarket
 version: '${version}'
 main: me.byteful.plugin.nightmarket.NightMarketPlugin
 api-version: 1.13
-softdepend: [ Vault, PlaceholderAPI ]
+softdepend: [ Vault, PlaceholderAPI, PlayerPoints ]
 author: byteful
 description: A plugin that brings a limited-access, rotating shop to Minecraft. Supports Vault and has an easy-to-use developer API for other plugins.
 permissions:

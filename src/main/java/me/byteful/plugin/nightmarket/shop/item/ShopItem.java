@@ -12,16 +12,16 @@ public class ShopItem {
     private final Currency currency;
     private final double amount;
     private final double rarity;
-    private final boolean isMultiplePurchase;
+    private final int purchaseLimit;
 
-    public ShopItem(String id, ItemStack icon, String command, Currency currency, double amount, double rarity, boolean isMultiplePurchase) {
+    public ShopItem(String id, ItemStack icon, String command, Currency currency, double amount, double rarity, int purchaseLimit) {
         this.id = id;
         this.icon = icon;
         this.command = command;
         this.currency = currency;
         this.amount = amount;
         this.rarity = rarity;
-        this.isMultiplePurchase = isMultiplePurchase;
+        this.purchaseLimit = purchaseLimit;
     }
 
     public String getId() {
@@ -44,8 +44,8 @@ public class ShopItem {
         return amount;
     }
 
-    public boolean isMultiplePurchase() {
-        return isMultiplePurchase;
+    public int getPurchaseLimit() {
+        return purchaseLimit;
     }
 
     public double getRarity() {
@@ -57,16 +57,16 @@ public class ShopItem {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ShopItem shopItem = (ShopItem) o;
-        return Double.compare(shopItem.amount, amount) == 0 && Double.compare(shopItem.rarity, rarity) == 0 && isMultiplePurchase == shopItem.isMultiplePurchase && Objects.equals(id, shopItem.id) && Objects.equals(icon, shopItem.icon) && Objects.equals(command, shopItem.command) && Objects.equals(currency, shopItem.currency);
+        return Double.compare(shopItem.amount, amount) == 0 && Double.compare(shopItem.rarity, rarity) == 0 && purchaseLimit == shopItem.purchaseLimit && Objects.equals(id, shopItem.id) && Objects.equals(icon, shopItem.icon) && Objects.equals(command, shopItem.command) && Objects.equals(currency, shopItem.currency);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, icon, command, currency, amount, rarity, isMultiplePurchase);
+        return Objects.hash(id, icon, command, currency, amount, rarity, purchaseLimit);
     }
 
     @Override
     public String toString() {
-        return "ShopItem{" + "id='" + id + '\'' + ", icon=" + icon + ", command='" + command + '\'' + ", currency=" + currency + ", amount=" + amount + ", rarity=" + rarity + ", isMultiplePurchase=" + isMultiplePurchase + '}';
+        return "ShopItem{" + "id='" + id + '\'' + ", icon=" + icon + ", command='" + command + '\'' + ", currency=" + currency + ", amount=" + amount + ", rarity=" + rarity + ", isMultiplePurchase=" + purchaseLimit + '}';
     }
 }

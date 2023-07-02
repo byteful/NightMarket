@@ -5,3 +5,4 @@ shop_not_open: &cThe shop is not currently open! It will open at: %nightmarket_o
 rotate_announcement: &6The NightMarket has rotated!
 reload_success: &aSuccessfully reloaded NightMarket's configuration.
 force_rotated: &aForcefully rotated {player}'s shop.
+shop_loading: &cSorry, but the shop is still loading! Please wait and try again later.

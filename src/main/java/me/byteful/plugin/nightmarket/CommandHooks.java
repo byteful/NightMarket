@@ -22,6 +22,11 @@ public class CommandHooks {
 
             return;
         }
+        if (!plugin.getCurrencyRegistry().isLoaded()) {
+            sender.sendMessage(plugin.getMessage(sender, "shop_loading"));
+
+            return;
+        }
 
         final PlayerShop shop = plugin.getPlayerShopManager().get(sender.getUniqueId());
         plugin.getParsedGUI().build(shop, plugin).open(sender);

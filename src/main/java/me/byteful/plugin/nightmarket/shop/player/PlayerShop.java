@@ -12,21 +12,29 @@ import java.util.*;
 
 public class PlayerShop {
     private final UUID uniqueId;
-    private final Set<String> purchasedShopItems;
+    private final Map<String, Integer> purchasedShopItems;
     private List<String> shopItems;
 
     public PlayerShop(ShopItemRegistry itemRegistry, UUID uniqueId) {
-        new RuntimeException("Create load").printStackTrace();
         this.uniqueId = uniqueId;
         this.shopItems = generateRandomShop(itemRegistry);
-        this.purchasedShopItems = new HashSet<>();
+        this.purchasedShopItems = new HashMap<>();
     }
 
-    public PlayerShop(UUID uniqueId, Set<String> purchasedShopItems, List<String> shopItems) {
-        new RuntimeException("DB load").printStackTrace();
+    public PlayerShop(UUID uniqueId, List<String> purchasedShopItems, List<String> shopItems) {
         this.uniqueId = uniqueId;
-        this.purchasedShopItems = purchasedShopItems;
+        this.purchasedShopItems = deserializePurchased(purchasedShopItems);
         this.shopItems = shopItems;
+    }
+
+    private static Map<String, Integer> deserializePurchased(List<String> list) {
+        final Map<String, Integer> map = new HashMap<>();
+        for (String data : list) {
+            final String[] split = data.split(":");
+            map.put(split[0], Integer.parseInt(split[1]));
+        }
+
+        return map;
     }
 
     public UUID getUniqueId() {
@@ -41,16 +49,23 @@ public class PlayerShop {
         this.shopItems = shopItems;
     }
 
-    public Set<String> getPurchasedShopItems() {
+    public Map<String, Integer> getPurchasedShopItems() {
         return purchasedShopItems;
     }
 
-    public boolean hasPurchasedItem(String item) {
-        return purchasedShopItems.contains(item);
+    public List<String> getSerializedPurchasedShopItems() {
+        final List<String> list = new ArrayList<>();
+        purchasedShopItems.forEach((id, amt) -> list.add(id + ":" + amt));
+
+        return list;
+    }
+
+    public int getPurchaseCount(String item) {
+        return purchasedShopItems.getOrDefault(item, 0);
     }
 
     public void purchaseItem(ShopItem item) {
-        purchasedShopItems.add(item.getId());
+        purchasedShopItems.merge(item.getId(), 1, Integer::sum);
         final OfflinePlayer player = Bukkit.getOfflinePlayer(uniqueId);
         final String cmd = item.getCommand().startsWith("/") ? item.getCommand().substring(1) : item.getCommand();
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Text.format(player, cmd.replace("{player}", Objects.requireNonNull(player.getName()))));

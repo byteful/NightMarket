@@ -15,7 +15,7 @@ public class ShopItemRegistry {
     public ShopItemRegistry(NightMarketPlugin plugin) {
         this.maxItems = plugin.getParsedGUI().getItemSlots().size();
         plugin.getConfig().getConfigurationSection("items").getValues(false).forEach((id, data) -> {
-            register(ShopItemParser.parse(plugin.getCurrencyRegistry(), (ConfigurationSection) data));
+            register(ShopItemParser.parse(plugin.getLogger(), plugin.getCurrencyRegistry(), (ConfigurationSection) data));
             plugin.getLogger().info("Registered item: " + id);
         });
     }
