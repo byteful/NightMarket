@@ -9,8 +9,6 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Scanner;
 
-// From: https://www.spigotmc.org/wiki/creating-an-update-checker-that-checks-for-updates
-// Further modified by byteful to accompany Tradeconomy.
 public final class UpdateChecker {
     private final NightMarketPlugin plugin;
     private String lastCheckedVersion = "N/A";

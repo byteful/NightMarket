@@ -10,12 +10,23 @@ import java.util.Map;
 
 public class ShopItemRegistry {
     private final Map<String, ShopItem> items = new HashMap<>();
-    private final int maxItems;
+    private final NightMarketPlugin plugin;
 
     public ShopItemRegistry(NightMarketPlugin plugin) {
-        this.maxItems = plugin.getParsedGUI().getItemSlots().size();
+        this.plugin = plugin;
+    }
+
+    public void load() {
         plugin.getConfig().getConfigurationSection("items").getValues(false).forEach((id, data) -> {
-            register(ShopItemParser.parse(plugin.getLogger(), plugin.getCurrencyRegistry(), (ConfigurationSection) data));
+            ShopItem parsed;
+            try {
+                parsed = ShopItemParser.parse(plugin.getLogger(), plugin.getCurrencyRegistry(), (ConfigurationSection) data);
+            } catch (Exception e) {
+                plugin.getLogger().warning("Skipped loading ShopItem: " + id + " (" + e.getMessage() + ")");
+                return;
+            }
+
+            register(parsed);
             plugin.getLogger().info("Registered item: " + id);
         });
     }
@@ -33,6 +44,6 @@ public class ShopItemRegistry {
     }
 
     public int getMaxItems() {
-        return maxItems;
+        return plugin.getParsedGUI().getItemSlots().size();
     }
 }

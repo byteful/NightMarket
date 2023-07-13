@@ -3,8 +3,8 @@ package me.byteful.plugin.nightmarket.currency.impl;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class VaultCurrency implements Currency {
@@ -17,17 +17,12 @@ public class VaultCurrency implements Currency {
 
     @Override
     public void load() {
-        final RegisteredServiceProvider<Economy> ecoP = Bukkit.getServicesManager().getRegistration(Economy.class);
-        if (ecoP == null) {
-            throw new RuntimeException("Failed to find Vault binding for Economy.");
-        }
-
-        this.eco = ecoP.getProvider();
+        this.eco = Objects.requireNonNull(Bukkit.getServicesManager().getRegistration(Economy.class), "Failed to find a valid Vault currency adapter.").getProvider();
     }
 
     @Override
     public boolean canLoad() {
-        return Bukkit.getPluginManager().isPluginEnabled("Vault");
+        return Bukkit.getPluginManager().isPluginEnabled("Vault") && Bukkit.getServicesManager().getRegistration(Economy.class) != null;
     }
 
     @Override

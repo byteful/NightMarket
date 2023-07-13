@@ -28,6 +28,8 @@ public class CurrencyRegistry {
 
         isLoaded = true;
         plugin.getLogger().info("Done loading currencies!");
+
+        plugin.getShopItemRegistry().load(); // Have to load items after currencies are loaded.
     }
 
     public Currency get(String id) {
@@ -37,6 +39,9 @@ public class CurrencyRegistry {
     public void register(Currency currency) {
         if (currency.canLoad()) {
             currency.load();
+            plugin.getLogger().info("Registered currency adapter: " + currency.getId());
+        } else {
+            plugin.getLogger().warning("Skipped loading currency adapter: " + currency.getId());
         }
 
         currencies.put(currency.getId().toLowerCase(), currency);
