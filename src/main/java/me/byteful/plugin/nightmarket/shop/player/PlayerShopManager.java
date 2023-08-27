@@ -26,6 +26,7 @@ public class PlayerShopManager implements Listener {
             for (PlayerShop shop : plugin.getDataStoreProvider().getAllShops()) {
                 shop.rotate(plugin.getShopItemRegistry());
                 plugin.getDataStoreProvider().setPlayerShop(shop);
+                if (Bukkit.getPlayer(shop.getUniqueId()) != null) loadedShops.put(shop.getUniqueId(), shop);
             }
         });
     }

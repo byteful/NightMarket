@@ -27,6 +27,26 @@ public class RotateScheduleManager {
 
     public RotateScheduleManager(NightMarketPlugin plugin) {
         this.plugin = plugin;
+    }
+
+    public ScheduledExecutorService getScheduler() {
+        return scheduler;
+    }
+
+    public LocalDateTime getNextTime() {
+        final LocalDateTime now = LocalDateTime.now();
+
+        return getDateNearest(scheduledTimes.stream().filter(x -> x.isAfter(now)).collect(Collectors.toList()), now);
+    }
+
+    public void rotate() {
+        plugin.getPlayerShopManager().rotateShops();
+        if (plugin.getConfig().getBoolean("other.rotate_announcement")) {
+            Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(format(p, color(plugin.getMessage(p, "rotate_announcement")))));
+        }
+    }
+
+    public void load() {
         final ConfigurationSection config = plugin.getConfig().getConfigurationSection("rotate_schedule");
         final ScheduleType mode = ScheduleType.fromName(config.getString("mode"));
         List<String> schedules;
@@ -64,22 +84,5 @@ public class RotateScheduleManager {
             }
         }.run();
         plugin.getLogger().info("Scheduled rotating times...");
-    }
-
-    public ScheduledExecutorService getScheduler() {
-        return scheduler;
-    }
-
-    public LocalDateTime getNextTime() {
-        final LocalDateTime now = LocalDateTime.now();
-
-        return getDateNearest(scheduledTimes.stream().filter(x -> x.isAfter(now)).collect(Collectors.toList()), now);
-    }
-
-    public void rotate() {
-        plugin.getPlayerShopManager().rotateShops();
-        if (plugin.getConfig().getBoolean("other.rotate_announcement")) {
-            Bukkit.getOnlinePlayers().forEach(p -> p.sendMessage(format(p, color(plugin.getMessage(p, "rotate_announcement")))));
-        }
     }
 }

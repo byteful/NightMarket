@@ -30,6 +30,7 @@ public class CurrencyRegistry {
         plugin.getLogger().info("Done loading currencies!");
 
         plugin.getShopItemRegistry().load(); // Have to load items after currencies are loaded.
+        plugin.getRotateScheduleManager().load();
     }
 
     public Currency get(String id) {
