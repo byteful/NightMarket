@@ -34,4 +34,9 @@ public class PlayerPointsCurrency implements Currency {
     public void withdraw(UUID player, double amount) {
         eco.take(player, (int) amount);
     }
+
+    @Override
+    public String getName(double amount) {
+        return amount == 1 ? "Token" : "Tokens";
+    }
 }

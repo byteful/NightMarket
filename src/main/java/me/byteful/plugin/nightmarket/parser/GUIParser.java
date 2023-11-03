@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
+import me.byteful.plugin.nightmarket.util.Text;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
@@ -111,7 +112,14 @@ public class GUIParser {
                     }
 
                     if (!item.getCurrency().canPlayerAfford(player.getUniqueId(), item.getAmount())) {
-                        e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "cannot_afford"));
+                        String currencyName = item.getCurrency().getName(item.getAmount());
+                        if (plugin.getConfig().getBoolean("other.lowercase_currency_names")) {
+                            currencyName = currencyName.toLowerCase();
+                        }
+
+                        e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "cannot_afford")
+                                .replace("{amount}", Text.formatCurrency(item.getAmount()))
+                                .replace("{currency}", currencyName));
                         e.getWhoClicked().closeInventory();
 
                         return;
@@ -122,7 +130,7 @@ public class GUIParser {
                     if (plugin.getConfig().getBoolean("other.close_on_buy")) {
                         e.getWhoClicked().closeInventory();
                     }
-                    e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "successfully_purchased_item"));
+                    e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "successfully_purchased_item").replace("{item}", item.getId()));
                 }));
             }
 

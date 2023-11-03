@@ -17,6 +17,12 @@ public class CommandHooks {
 
     @CommandHook("open")
     public void onOpen(Player sender) {
+        if (!sender.hasPermission("nightmarket.use")) {
+            sender.sendMessage(plugin.getMessage(sender, "no_permission"));
+
+            return;
+        }
+
         if (!plugin.getAccessScheduleManager().isShopOpen()) {
             sender.sendMessage(plugin.getMessage(sender, "shop_not_open"));
 
@@ -34,6 +40,12 @@ public class CommandHooks {
 
     @CommandHook("reload")
     public void onReload(CommandSender sender) {
+        if (!sender.hasPermission("nightmarket.admin")) {
+            sender.sendMessage(plugin.getMessage(null, "no_permission"));
+
+            return;
+        }
+
         plugin.getRotateScheduleManager().getScheduler().shutdownNow();
         try {
             plugin.getDataStoreProvider().close();
@@ -54,12 +66,24 @@ public class CommandHooks {
 
     @CommandHook("forcerotate")
     public void onForceRotate(CommandSender sender, Player player) {
+        if (!sender.hasPermission("nightmarket.admin")) {
+            sender.sendMessage(plugin.getMessage(null, "no_permission"));
+
+            return;
+        }
+
         plugin.getPlayerShopManager().get(player.getUniqueId()).rotate(plugin.getShopItemRegistry());
         sender.sendMessage(plugin.getMessage(null, "force_rotated").replace("{player}", player.getName()));
     }
 
     @CommandHook("debug")
     public void onDebug(CommandSender sender) {
+        if (!sender.hasPermission("nightmarket.admin")) {
+            sender.sendMessage(plugin.getMessage(null, "no_permission"));
+
+            return;
+        }
+
         plugin.getUpdateChecker().check();
         sender.sendMessage("NightMarket Debug Information:");
         sender.sendMessage("- Server Version: " + Bukkit.getVersion());

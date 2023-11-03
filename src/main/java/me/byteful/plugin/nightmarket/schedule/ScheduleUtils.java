@@ -1,12 +1,14 @@
 package me.byteful.plugin.nightmarket.schedule;
 
+import me.byteful.plugin.nightmarket.NightMarketPlugin;
+
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
 public class ScheduleUtils {
     public static LocalDateTime getDateNearest(List<LocalDateTime> dates, LocalDateTime targetDate) {
-        final ZoneOffset offset = ZoneOffset.systemDefault().getRules().getOffset(targetDate);
+        final ZoneOffset offset = NightMarketPlugin.getInstance().getTimezone().getRules().getOffset(targetDate);
         long minDiff = -1, currentTime = targetDate.toEpochSecond(offset);
         LocalDateTime minDate = null;
         for (LocalDateTime date : dates) {

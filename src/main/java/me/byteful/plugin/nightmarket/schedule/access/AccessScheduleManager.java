@@ -39,7 +39,7 @@ public class AccessScheduleManager {
     }
 
     public LocalDateTime getNextTime() {
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone());
 
         if (isShopOpen()) {
             return now;

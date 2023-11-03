@@ -5,10 +5,17 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import redempt.redlib.misc.FormatUtils;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class Text {
+    private static final DecimalFormat CURRENCY_FORMAT = new DecimalFormat("#.##");
+
+    public static String formatCurrency(double amount) {
+        return CURRENCY_FORMAT.format(amount);
+    }
+
     public static String color(String str) {
         return FormatUtils.color(str, true);
     }

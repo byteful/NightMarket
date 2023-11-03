@@ -38,4 +38,13 @@ public interface Currency {
      * @param amount the decimal price
      */
     void withdraw(UUID player, double amount);
+
+    /**
+     * Returns a singular/plural name depending on the currency amount.
+     * Ex: [amount] dollar(s)
+     *
+     * @param amount the amount of this currency
+     * @return the formatted currency name
+     */
+    String getName(double amount);
 }

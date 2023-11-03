@@ -4,9 +4,7 @@ import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.schedule.ScheduleType;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.scheduler.BukkitRunnable;
 
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -21,9 +19,9 @@ import static me.byteful.plugin.nightmarket.util.Text.color;
 import static me.byteful.plugin.nightmarket.util.Text.format;
 
 public class RotateScheduleManager {
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-    private final NightMarketPlugin plugin;
-    private final Set<LocalDateTime> scheduledTimes = new HashSet<>();
+    final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+    final NightMarketPlugin plugin;
+    final Set<LocalDateTime> scheduledTimes = new HashSet<>();
 
     public RotateScheduleManager(NightMarketPlugin plugin) {
         this.plugin = plugin;
@@ -34,7 +32,7 @@ public class RotateScheduleManager {
     }
 
     public LocalDateTime getNextTime() {
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone());
 
         return getDateNearest(scheduledTimes.stream().filter(x -> x.isAfter(now)).collect(Collectors.toList()), now);
     }
@@ -59,30 +57,13 @@ public class RotateScheduleManager {
             throw new UnsupportedOperationException();
         }
 
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone());
 
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                for (String schedule : schedules) {
-                    final LocalDateTime then = mode.parse(schedule);
-                    if (now.isAfter(then) && mode == ScheduleType.DATE) {
-                        plugin.getLogger().warning("Please remove old date '" + schedule + "' from your config.");
-
-                        continue;
-                    }
-                    scheduledTimes.add(then);
-                    scheduler.schedule(() -> {
-                        rotate();
-                        scheduledTimes.remove(then);
-                    }, Duration.between(now, then).toMillis(), TimeUnit.MILLISECONDS);
-                }
-
-                if (mode == ScheduleType.TIMES) {
-                    runTaskLater(plugin, 20L * TimeUnit.DAYS.toSeconds(1));
-                }
-            }
-        }.run();
+        new ScheduleTask(schedules, mode, now, this).run();
         plugin.getLogger().info("Scheduled rotating times...");
+    }
+
+    public void scheduleTask(List<String> schedules, ScheduleType mode, LocalDateTime now, RotateScheduleManager scheduleManager) {
+        Bukkit.getScheduler().runTaskLater(plugin, new ScheduleTask(schedules, mode, now, scheduleManager), 20L * TimeUnit.DAYS.toSeconds(1));
     }
 }

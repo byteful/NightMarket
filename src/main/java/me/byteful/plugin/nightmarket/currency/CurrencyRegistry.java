@@ -31,6 +31,8 @@ public class CurrencyRegistry {
 
         plugin.getShopItemRegistry().load(); // Have to load items after currencies are loaded.
         plugin.getRotateScheduleManager().load();
+
+        Bukkit.getOnlinePlayers().forEach(p -> plugin.getPlayerShopManager().load(p.getUniqueId()));
     }
 
     public Currency get(String id) {

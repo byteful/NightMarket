@@ -34,4 +34,9 @@ public class VaultCurrency implements Currency {
     public void withdraw(UUID player, double amount) {
         eco.withdrawPlayer(Bukkit.getOfflinePlayer(player), Math.abs(amount));
     }
+
+    @Override
+    public String getName(double amount) {
+        return amount == 1 ? "Dollar" : "Dollars";
+    }
 }

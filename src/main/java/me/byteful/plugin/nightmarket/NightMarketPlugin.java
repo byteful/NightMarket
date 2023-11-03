@@ -23,6 +23,8 @@ import redempt.redlib.commandmanager.CommandParser;
 import redempt.redlib.commandmanager.Messages;
 
 import java.io.IOException;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 
 public final class NightMarketPlugin extends JavaPlugin {
@@ -39,6 +41,7 @@ public final class NightMarketPlugin extends JavaPlugin {
     private GUIParser.ParsedGUI parsedGUI;
     private Messages messages;
     private BukkitTask updateCheckingTask;
+    private ZoneId timezone;
 
     public static NightMarketPlugin getInstance() {
         return instance;
@@ -49,6 +52,8 @@ public final class NightMarketPlugin extends JavaPlugin {
         instance = this;
 
         saveDefaultConfig();
+        getConfig().options().copyDefaults(true).parseComments(true);
+        saveConfig();
         getLogger().info("Loaded config...");
         reloadMessages();
         getLogger().info("Loaded messages...");
@@ -124,22 +129,26 @@ public final class NightMarketPlugin extends JavaPlugin {
 
         if (!dataStoreProvider.test()) {
             getLogger().info("Failed DataStore testing... Plugin shutting down.");
+            dataStoreProvider = null;
             Bukkit.getPluginManager().disablePlugin(this);
 
             return;
         }
 
-        Bukkit.getOnlinePlayers().forEach(p -> playerShopManager.load(p.getUniqueId()));
         getLogger().info("Loaded data store...");
     }
 
     @Override
     public void onDisable() {
-        getRotateScheduleManager().getScheduler().shutdownNow();
-        try {
-            getDataStoreProvider().close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (rotateScheduleManager != null) {
+            getRotateScheduleManager().getScheduler().shutdownNow();
+        }
+        if (dataStoreProvider != null) {
+            try {
+                getDataStoreProvider().close();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
         instance = null;
@@ -186,6 +195,13 @@ public final class NightMarketPlugin extends JavaPlugin {
     }
 
     void reloadRotateSchedules() {
+        final String read = getConfig().getString("timezone");
+        if (read == null || read.isEmpty()) {
+            timezone = ZoneOffset.systemDefault();
+        } else {
+            timezone = ZoneOffset.of(read, ZoneOffset.SHORT_IDS);
+        }
+
         rotateScheduleManager = new RotateScheduleManager(this);
     }
 
@@ -209,5 +225,9 @@ public final class NightMarketPlugin extends JavaPlugin {
         if (getDescription().getVersion().contains("BETA")) {
             getLogger().info("[DEBUG] " + message);
         }
+    }
+
+    public ZoneId getTimezone() {
+        return timezone;
     }
 }

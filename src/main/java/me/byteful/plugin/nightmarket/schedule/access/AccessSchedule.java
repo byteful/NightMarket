@@ -1,5 +1,6 @@
 package me.byteful.plugin.nightmarket.schedule.access;
 
+import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.schedule.ScheduleType;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,7 @@ public class AccessSchedule {
     }
 
     public boolean isNowBetween() {
-        final LocalDateTime now = LocalDateTime.now();
+        final LocalDateTime now = LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone());
 
         return now.isAfter(start) && now.isBefore(end);
     }
