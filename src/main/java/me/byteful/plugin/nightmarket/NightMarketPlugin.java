@@ -133,6 +133,7 @@ public final class NightMarketPlugin extends JavaPlugin {
       return;
     }
 
+    LibraryLoader.clearUnusedJars(this);
     getLogger().info("Loaded data store...");
   }
 

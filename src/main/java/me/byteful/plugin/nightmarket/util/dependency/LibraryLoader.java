@@ -10,11 +10,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 // Much of this code was borrowed from lucko's helper library. Adapted by byteful to support isolated class loaders.
 public final class LibraryLoader {
   private static final Supplier<URLClassLoaderAccess> URL_INJECTOR = Suppliers.memoize(() -> URLClassLoaderAccess.create((URLClassLoader) NightMarketPlugin.class.getClassLoader()));
+  private static final List<String> USED_NAMES = new ArrayList<>();
 
   public static IsolatedClassLoader load(NightMarketPlugin plugin, String groupId, String artifactId, String version) {
     return load(plugin, groupId, artifactId, version, "https://repo1.maven.org/maven2");
@@ -33,6 +36,7 @@ public final class LibraryLoader {
     try {
       final IsolatedClassLoader loader = new IsolatedClassLoader(saveLocation.toURI().toURL());
       plugin.getLogger().info("Loaded dependency '" + name + "' successfully.");
+      USED_NAMES.add(saveLocation.getName());
 
       return loader;
     } catch (MalformedURLException e) {
@@ -57,6 +61,8 @@ public final class LibraryLoader {
     try {
       URL_INJECTOR.get().addURL(saveLocation.toURI().toURL());
       plugin.getLogger().info("Loaded dependency '" + name + "' successfully.");
+
+      USED_NAMES.add(saveLocation.getName());
     } catch (Exception e) {
       throw new RuntimeException("Unable to load dependency: " + saveLocation, e);
     }
@@ -93,6 +99,16 @@ public final class LibraryLoader {
     }
 
     return folder;
+  }
+
+  public static void clearUnusedJars(NightMarketPlugin plugin) {
+    final File folder = getLibFolder(plugin);
+
+    for (File file : Objects.requireNonNull(folder.listFiles())) {
+      if (!file.getName().endsWith(".jar") || USED_NAMES.contains(file.getName())) continue;
+
+      file.delete();
+    }
   }
 
   public static final class Dependency {
