@@ -28,206 +28,204 @@ import java.time.ZoneOffset;
 import java.util.concurrent.TimeUnit;
 
 public final class NightMarketPlugin extends JavaPlugin {
-    private static NightMarketPlugin instance;
+  private static NightMarketPlugin instance;
 
-    private final UpdateChecker updateChecker = new UpdateChecker(this);
+  private final UpdateChecker updateChecker = new UpdateChecker(this);
 
-    private CurrencyRegistry currencyRegistry;
-    private DataStoreProvider dataStoreProvider;
-    private PlayerShopManager playerShopManager;
-    private RotateScheduleManager rotateScheduleManager;
-    private AccessScheduleManager accessScheduleManager;
-    private ShopItemRegistry shopItemRegistry;
-    private GUIParser.ParsedGUI parsedGUI;
-    private Messages messages;
-    private BukkitTask updateCheckingTask;
-    private ZoneId timezone;
+  private CurrencyRegistry currencyRegistry;
+  private DataStoreProvider dataStoreProvider;
+  private PlayerShopManager playerShopManager;
+  private RotateScheduleManager rotateScheduleManager;
+  private AccessScheduleManager accessScheduleManager;
+  private ShopItemRegistry shopItemRegistry;
+  private GUIParser.ParsedGUI parsedGUI;
+  private Messages messages;
+  private BukkitTask updateCheckingTask;
+  private ZoneId timezone;
 
-    public static NightMarketPlugin getInstance() {
-        return instance;
+  public static NightMarketPlugin getInstance() {
+    return instance;
+  }
+
+  @Override
+  public void onEnable() {
+    instance = this;
+
+    saveDefaultConfig();
+    getLogger().info("Loaded config...");
+    reloadMessages();
+    getLogger().info("Loaded messages...");
+    reloadCurrencyManager();
+    getLogger().info("Loaded currencies...");
+    playerShopManager = new PlayerShopManager(this);
+    getLogger().info("Loaded player shops...");
+    reloadRotateSchedules();
+    getLogger().info("Loaded rotate schedules...");
+    reloadAccessSchedules();
+    getLogger().info("Loaded access schedules...");
+    reloadParsedGUI();
+    getLogger().info("Loaded GUI...");
+    reloadShopItems();
+    getLogger().info("Loaded shop items...");
+    loadDataStore();
+    reloadUpdateChecker();
+
+    new CommandParser(getResource("commands.rdcml")).parse().register(this, "nightmarket", new CommandHooks(this));
+    if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
+      new NightMarketPlaceholders(this).register();
+    }
+  }
+
+  void reloadUpdateChecker() {
+    if (updateCheckingTask != null) {
+      updateCheckingTask.cancel();
+      updateCheckingTask = null;
     }
 
-    @Override
-    public void onEnable() {
-        instance = this;
+    if (getConfig().getBoolean("other.update")) {
+      updateCheckingTask = Bukkit.getScheduler().runTaskTimer(this, updateChecker::check, 0L, 20L * TimeUnit.DAYS.toSeconds(1));
+    }
+  }
 
-        saveDefaultConfig();
-        getConfig().options().copyDefaults(true).parseComments(true);
-        saveConfig();
-        getLogger().info("Loaded config...");
-        reloadMessages();
-        getLogger().info("Loaded messages...");
-        reloadCurrencyManager();
-        getLogger().info("Loaded currencies...");
-        playerShopManager = new PlayerShopManager(this);
-        getLogger().info("Loaded player shops...");
-        reloadRotateSchedules();
-        getLogger().info("Loaded rotate schedules...");
-        reloadAccessSchedules();
-        getLogger().info("Loaded access schedules...");
-        reloadParsedGUI();
-        getLogger().info("Loaded GUI...");
-        reloadShopItems();
-        getLogger().info("Loaded shop items...");
-        loadDataStore();
-        reloadUpdateChecker();
+  void loadDataStore() {
+    switch (getConfig().getString("datastore.type").toLowerCase().trim().replace(" ", "_")) {
+      case "mysql":
+      case "mariadb": {
+        LibraryLoader.loadWithInject(this, "com.mysql", "mysql-connector-j", "8.3.0");
+        dataStoreProvider = new MySQLDataStoreProvider(this);
+        getLogger().info("Detected data store type: MySQL-remote");
 
-        new CommandParser(getResource("commands.rdcml")).parse().register(this, "nightmarket", new CommandHooks(this));
-        if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
-            new NightMarketPlaceholders(this).register();
-        }
+        break;
+      }
+
+      case "mongo":
+      case "mongodb": {
+        LibraryLoader.loadWithInject(this, "org.mongodb", "mongo-java-driver", "3.12.14");
+        dataStoreProvider = new MongoDataStoreProvider(this);
+        getLogger().info("Detected data store type: MongoDB-remote");
+
+        break;
+      }
+
+      case "json":
+      case "file": {
+        dataStoreProvider = new JSONDataStoreProvider(this);
+        getLogger().info("Detected data store type: JSON-file");
+
+        break;
+      }
+
+      case "sqlite":
+      case "flatfile": {
+        final IsolatedClassLoader loader = LibraryLoader.load(this, "org.xerial", "sqlite-jdbc", "3.42.0.0");
+        dataStoreProvider = new SQLiteDataStoreProvider(loader, this);
+        getLogger().info("Detected data store type: SQLite-file");
+
+        break;
+      }
     }
 
-    void reloadUpdateChecker() {
-        if (updateCheckingTask != null) {
-            updateCheckingTask.cancel();
-            updateCheckingTask = null;
-        }
+    if (!dataStoreProvider.test()) {
+      getLogger().info("Failed DataStore testing... Plugin shutting down.");
+      dataStoreProvider = null;
+      Bukkit.getPluginManager().disablePlugin(this);
 
-        if (getConfig().getBoolean("other.update")) {
-            updateCheckingTask = Bukkit.getScheduler().runTaskTimer(this, updateChecker::check, 0L, 20L * TimeUnit.DAYS.toSeconds(1));
-        }
+      return;
     }
 
-    void loadDataStore() {
-        switch (getConfig().getString("datastore.type").toLowerCase().trim().replace(" ", "_")) {
-            case "mysql":
-            case "mariadb": {
-                LibraryLoader.loadWithInject(this, "com.mysql", "mysql-connector-j", "8.0.33");
-                dataStoreProvider = new MySQLDataStoreProvider(this);
-                getLogger().info("Detected data store type: MySQL-remote");
+    getLogger().info("Loaded data store...");
+  }
 
-                break;
-            }
-
-            case "mongo":
-            case "mongodb": {
-                LibraryLoader.loadWithInject(this, "org.mongodb", "mongo-java-driver", "3.12.14");
-                dataStoreProvider = new MongoDataStoreProvider(this);
-                getLogger().info("Detected data store type: MongoDB-remote");
-
-                break;
-            }
-
-            case "json":
-            case "file": {
-                dataStoreProvider = new JSONDataStoreProvider(this);
-                getLogger().info("Detected data store type: JSON-file");
-
-                break;
-            }
-
-            case "sqlite":
-            case "flatfile": {
-                final IsolatedClassLoader loader = LibraryLoader.load(this, "org.xerial", "sqlite-jdbc", "3.42.0.0");
-                dataStoreProvider = new SQLiteDataStoreProvider(loader, this);
-                getLogger().info("Detected data store type: SQLite-file");
-
-                break;
-            }
-        }
-
-        if (!dataStoreProvider.test()) {
-            getLogger().info("Failed DataStore testing... Plugin shutting down.");
-            dataStoreProvider = null;
-            Bukkit.getPluginManager().disablePlugin(this);
-
-            return;
-        }
-
-        getLogger().info("Loaded data store...");
+  @Override
+  public void onDisable() {
+    if (rotateScheduleManager != null) {
+      getRotateScheduleManager().getScheduler().shutdownNow();
+    }
+    if (dataStoreProvider != null) {
+      try {
+        getDataStoreProvider().close();
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
     }
 
-    @Override
-    public void onDisable() {
-        if (rotateScheduleManager != null) {
-            getRotateScheduleManager().getScheduler().shutdownNow();
-        }
-        if (dataStoreProvider != null) {
-            try {
-                getDataStoreProvider().close();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+    instance = null;
+  }
 
-        instance = null;
+  public RotateScheduleManager getRotateScheduleManager() {
+    return rotateScheduleManager;
+  }
+
+  public AccessScheduleManager getAccessScheduleManager() {
+    return accessScheduleManager;
+  }
+
+  public DataStoreProvider getDataStoreProvider() {
+    return dataStoreProvider;
+  }
+
+  public CurrencyRegistry getCurrencyRegistry() {
+    return currencyRegistry;
+  }
+
+  public PlayerShopManager getPlayerShopManager() {
+    return playerShopManager;
+  }
+
+  public ShopItemRegistry getShopItemRegistry() {
+    return shopItemRegistry;
+  }
+
+  public GUIParser.ParsedGUI getParsedGUI() {
+    return parsedGUI;
+  }
+
+  public String getMessage(Player context, String key) {
+    return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI") && context != null ? PlaceholderAPI.setPlaceholders(context, messages.get(key)) : messages.get(key);
+  }
+
+  void reloadMessages() {
+    messages = Messages.load(this);
+  }
+
+  void reloadParsedGUI() {
+    parsedGUI = GUIParser.parse(getConfig().getConfigurationSection("gui"));
+  }
+
+  void reloadRotateSchedules() {
+    final String read = getConfig().getString("timezone");
+    if (read == null || read.isEmpty()) {
+      timezone = ZoneOffset.systemDefault();
+    } else {
+      timezone = ZoneOffset.of(read, ZoneOffset.SHORT_IDS);
     }
 
-    public RotateScheduleManager getRotateScheduleManager() {
-        return rotateScheduleManager;
-    }
+    rotateScheduleManager = new RotateScheduleManager(this);
+  }
 
-    public AccessScheduleManager getAccessScheduleManager() {
-        return accessScheduleManager;
-    }
+  void reloadAccessSchedules() {
+    accessScheduleManager = new AccessScheduleManager(this);
+  }
 
-    public DataStoreProvider getDataStoreProvider() {
-        return dataStoreProvider;
-    }
+  void reloadShopItems() {
+    shopItemRegistry = new ShopItemRegistry(this);
+  }
 
-    public CurrencyRegistry getCurrencyRegistry() {
-        return currencyRegistry;
-    }
+  void reloadCurrencyManager() {
+    currencyRegistry = new CurrencyRegistry(this);
+  }
 
-    public PlayerShopManager getPlayerShopManager() {
-        return playerShopManager;
-    }
+  public UpdateChecker getUpdateChecker() {
+    return updateChecker;
+  }
 
-    public ShopItemRegistry getShopItemRegistry() {
-        return shopItemRegistry;
+  public void debug(String message) {
+    if (getDescription().getVersion().contains("BETA")) {
+      getLogger().info("[DEBUG] " + message);
     }
+  }
 
-    public GUIParser.ParsedGUI getParsedGUI() {
-        return parsedGUI;
-    }
-
-    public String getMessage(Player context, String key) {
-        return Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI") && context != null ? PlaceholderAPI.setPlaceholders(context, messages.get(key)) : messages.get(key);
-    }
-
-    void reloadMessages() {
-        messages = Messages.load(this);
-    }
-
-    void reloadParsedGUI() {
-        parsedGUI = GUIParser.parse(getConfig().getConfigurationSection("gui"));
-    }
-
-    void reloadRotateSchedules() {
-        final String read = getConfig().getString("timezone");
-        if (read == null || read.isEmpty()) {
-            timezone = ZoneOffset.systemDefault();
-        } else {
-            timezone = ZoneOffset.of(read, ZoneOffset.SHORT_IDS);
-        }
-
-        rotateScheduleManager = new RotateScheduleManager(this);
-    }
-
-    void reloadAccessSchedules() {
-        accessScheduleManager = new AccessScheduleManager(this);
-    }
-
-    void reloadShopItems() {
-        shopItemRegistry = new ShopItemRegistry(this);
-    }
-
-    void reloadCurrencyManager() {
-        currencyRegistry = new CurrencyRegistry(this);
-    }
-
-    public UpdateChecker getUpdateChecker() {
-        return updateChecker;
-    }
-
-    public void debug(String message) {
-        if (getDescription().getVersion().contains("BETA")) {
-            getLogger().info("[DEBUG] " + message);
-        }
-    }
-
-    public ZoneId getTimezone() {
-        return timezone;
-    }
+  public ZoneId getTimezone() {
+    return timezone;
+  }
 }

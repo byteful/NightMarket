@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.1.0'
+version = '1.1.1'
 
 repositories {
     mavenCentral()
@@ -32,31 +32,35 @@ repositories {
     maven {
         url = 'https://repo.rosewooddev.io/repository/public/'
     }
+    maven {
+        url = 'https://repo.auxilor.io/repository/maven-public/'
+    }
 }
 
 dependencies {
     // Spigot libs
-    compileOnly 'org.spigotmc:spigot-api:1.20.2-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.20.4-R0.1-SNAPSHOT'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:9.7.0'
-    implementation 'com.github.Redempt:RedLib:6.5.8'
+    implementation 'com.github.cryptomorin:XSeries:9.9.0'
+    implementation 'com.github.Redempt:RedLib:6.6.1'
 
     // External plugin libs
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.5'
     compileOnly 'org.black_ixx:playerpoints:3.2.6'
+    compileOnly 'com.github.Auxilor:EcoBits:9679e84fd2' // 1.8.4
 
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
     compileOnly 'org.mongodb:mongo-java-driver:3.12.14'
-    compileOnly 'com.mysql:mysql-connector-j:8.0.33'
+    compileOnly 'com.mysql:mysql-connector-j:8.3.0'
     compileOnly 'org.xerial:sqlite-jdbc:3.42.0.0'
 }
 
 def targetJavaVersion = 8
 java {
     def javaVersion = JavaVersion.toVersion(targetJavaVersion)
-    sourceCompatibility = javaVersion
+    sourceCompatibility = 17
     targetCompatibility = javaVersion
     if (JavaVersion.current() < javaVersion) {
         toolchain.languageVersion = JavaLanguageVersion.of(targetJavaVersion)

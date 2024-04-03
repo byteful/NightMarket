@@ -14,39 +14,39 @@ import java.util.stream.Collectors;
 import static me.byteful.plugin.nightmarket.schedule.ScheduleUtils.getDateNearest;
 
 public class AccessScheduleManager {
-    private final Set<AccessSchedule> schedules = new HashSet<>();
+  private final Set<AccessSchedule> schedules = new HashSet<>();
 
-    public AccessScheduleManager(NightMarketPlugin plugin) {
-        final ConfigurationSection config = plugin.getConfig().getConfigurationSection("access_schedule");
-        final ScheduleType mode = ScheduleType.fromName(config.getString("mode"));
-        List<Map<?, ?>> scheduleMap;
+  public AccessScheduleManager(NightMarketPlugin plugin) {
+    final ConfigurationSection config = plugin.getConfig().getConfigurationSection("access_schedule");
+    final ScheduleType mode = ScheduleType.fromName(config.getString("mode"));
+    List<Map<?, ?>> scheduleMap;
 
-        if (mode == ScheduleType.DATE) {
-            scheduleMap = config.getMapList("dates");
-        } else if (mode == ScheduleType.TIMES) {
-            scheduleMap = config.getMapList("times");
-        } else {
-            throw new UnsupportedOperationException();
-        }
-
-        for (Map<?, ?> map : scheduleMap) {
-            schedules.add(new AccessSchedule(mode, map));
-        }
+    if (mode == ScheduleType.DATE) {
+      scheduleMap = config.getMapList("dates");
+    } else if (mode == ScheduleType.TIMES) {
+      scheduleMap = config.getMapList("times");
+    } else {
+      throw new UnsupportedOperationException();
     }
 
-    public boolean isShopOpen() {
-        return schedules.stream().anyMatch(AccessSchedule::isNowBetween);
+    for (Map<?, ?> map : scheduleMap) {
+      schedules.add(new AccessSchedule(mode, map));
+    }
+  }
+
+  public boolean isShopOpen() {
+    return schedules.stream().anyMatch(AccessSchedule::isNowBetween);
+  }
+
+  public LocalDateTime getNextTime() {
+    final LocalDateTime now = LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone());
+
+    if (isShopOpen()) {
+      return now;
     }
 
-    public LocalDateTime getNextTime() {
-        final LocalDateTime now = LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone());
+    System.out.println(schedules.stream().map(AccessSchedule::getStart).collect(Collectors.toList()));
 
-        if (isShopOpen()) {
-            return now;
-        }
-
-        System.out.println(schedules.stream().map(AccessSchedule::getStart).collect(Collectors.toList()));
-
-        return getDateNearest(schedules.stream().map(AccessSchedule::getStart).collect(Collectors.toList()), now);
-    }
+    return getDateNearest(schedules.stream().map(AccessSchedule::getStart).collect(Collectors.toList()), now);
+  }
 }

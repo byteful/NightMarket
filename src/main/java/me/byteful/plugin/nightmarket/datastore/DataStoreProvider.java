@@ -10,13 +10,13 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface DataStoreProvider extends Closeable {
-    Gson GSON = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
+  Gson GSON = new GsonBuilder().serializeNulls().disableHtmlEscaping().create();
 
-    void setPlayerShop(PlayerShop shop);
+  void setPlayerShop(PlayerShop shop);
 
-    Optional<PlayerShop> getPlayerShop(UUID player);
+  Optional<PlayerShop> getPlayerShop(UUID player);
 
-    Set<PlayerShop> getAllShops();
+  Set<PlayerShop> getAllShops();
 
-    boolean test();
+  boolean test();
 }

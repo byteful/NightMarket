@@ -7,6 +7,7 @@ softdepend:
   - PlaceholderAPI
   - PlayerPoints
   - EssentialsX
+  - EcoBits
 author: byteful
 description: A plugin that brings a limited-access, rotating shop to Minecraft. Supports Vault and has an easy-to-use developer API for other plugins.
 permissions:
