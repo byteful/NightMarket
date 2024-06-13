@@ -2,9 +2,10 @@ package me.byteful.plugin.nightmarket.datastore.impl;
 
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.datastore.SQLDataStoreProvider;
-import redempt.redlib.sql.SQLHelper;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 public class MySQLDataStoreProvider extends SQLDataStoreProvider {
   public MySQLDataStoreProvider(NightMarketPlugin plugin) {
@@ -12,6 +13,16 @@ public class MySQLDataStoreProvider extends SQLDataStoreProvider {
   }
 
   private static Connection buildConnection(String host, int port, String user, String pass, String database) {
-    return SQLHelper.openMySQL(host, port, user, pass, database);
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+
+      final Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/?user=" + user + "&password=" + pass);
+      connection.createStatement().execute("CREATE DATABASE IF NOT EXISTS " + database + ";");
+      connection.createStatement().execute("USE " + database + ";");
+
+      return connection;
+    } catch (SQLException | ClassNotFoundException e) {
+      throw new RuntimeException("Failed to connect to MySQL!", e);
+    }
   }
 }

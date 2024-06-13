@@ -3,6 +3,7 @@ package me.byteful.plugin.nightmarket.util.dependency;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
+import redempt.redlib.RedLib;
 
 import java.io.File;
 import java.io.InputStream;
@@ -28,6 +29,8 @@ public final class LibraryLoader {
   }
 
   public static IsolatedClassLoader load(NightMarketPlugin plugin, Dependency d) {
+    if (RedLib.MID_VERSION >= 17)
+      return null; // We don't need to do this ourselves because Spigot has library loading support now!
     final String name = d.getArtifactId() + "-" + d.getVersion();
     final File saveLocation = new File(getLibFolder(plugin), name + ".jar");
 
@@ -53,6 +56,9 @@ public final class LibraryLoader {
   }
 
   public static void loadWithInject(NightMarketPlugin plugin, Dependency d) {
+    if (RedLib.MID_VERSION >= 17)
+      return; // We don't need to do this ourselves because Spigot has library loading support now!
+
     final String name = d.getArtifactId() + "-" + d.getVersion();
     final File saveLocation = new File(getLibFolder(plugin), name + ".jar");
 

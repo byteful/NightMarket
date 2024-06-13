@@ -91,7 +91,7 @@ public final class NightMarketPlugin extends JavaPlugin {
     switch (getConfig().getString("datastore.type").toLowerCase().trim().replace(" ", "_")) {
       case "mysql":
       case "mariadb": {
-        LibraryLoader.loadWithInject(this, "com.mysql", "mysql-connector-j", "8.3.0");
+        LibraryLoader.loadWithInject(this, "com.mysql", "mysql-connector-j", "8.4.0");
         dataStoreProvider = new MySQLDataStoreProvider(this);
         getLogger().info("Detected data store type: MySQL-remote");
 
@@ -117,7 +117,7 @@ public final class NightMarketPlugin extends JavaPlugin {
 
       case "sqlite":
       case "flatfile": {
-        final IsolatedClassLoader loader = LibraryLoader.load(this, "org.xerial", "sqlite-jdbc", "3.42.0.0");
+        final IsolatedClassLoader loader = LibraryLoader.load(this, "org.xerial", "sqlite-jdbc", "3.42.0.0"); // Use older version of SQLite for compatibility
         dataStoreProvider = new SQLiteDataStoreProvider(loader, this);
         getLogger().info("Detected data store type: SQLite-file");
 

@@ -7,7 +7,7 @@ import java.net.URLClassLoader;
 /**
  * Provides access to {@link URLClassLoader}#addURL.
  */
-// Brought from lucko's helper library.
+// Brought from lucko's helper library. Only works on older Java versions!
 public abstract class URLClassLoaderAccess {
 
   private final URLClassLoader classLoader;
