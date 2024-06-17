@@ -13,7 +13,9 @@ import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.inventorygui.ItemButton;
 import redempt.redlib.misc.WeightedRandom;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static me.byteful.plugin.nightmarket.util.Text.color;
 
@@ -25,22 +27,55 @@ public class GUIParser {
     final ItemStack backgroundIcon = IconParser.parse(config.getConfigurationSection("background_icon"));
     final List<String> backgroundSlots = config.getStringList("background_slots");
     final List<String> itemSlots = config.getStringList("item_slots");
-    Preconditions.checkArgument(itemSlots.size() > 0, "Item slots need to be greater than 0!");
+    Preconditions.checkArgument(!itemSlots.isEmpty(), "Item slots need to be greater than 0!");
 
-    return new ParsedGUI(backgroundIcon, SlotNumberParser.parse(backgroundSlots), SlotNumberParser.parse(itemSlots), title, rows);
+    final Set<ExtraIcon> extraIcons = new HashSet<>();
+
+    if (config.contains("extra_icons")) {
+      final ConfigurationSection extraIconsConfig = config.getConfigurationSection("extra_icons");
+      extraIconsConfig.getValues(false).forEach((id, data) -> {
+        final ConfigurationSection iconConfig = (ConfigurationSection) data;
+        final ItemStack icon = IconParser.parse(iconConfig);
+        final List<Integer> slots = SlotNumberParser.parse(iconConfig.getStringList("slots"));
+
+        extraIcons.add(new ExtraIcon(icon, slots));
+      });
+    }
+
+    return new ParsedGUI(backgroundIcon, SlotNumberParser.parse(backgroundSlots), SlotNumberParser.parse(itemSlots), extraIcons, title, rows);
+  }
+
+  public static class ExtraIcon {
+    private final ItemStack icon;
+    private final List<Integer> slots;
+
+    private ExtraIcon(ItemStack icon, List<Integer> slots) {
+      this.icon = icon;
+      this.slots = slots;
+    }
+
+    public ItemStack getIcon() {
+      return icon;
+    }
+
+    public List<Integer> getSlots() {
+      return slots;
+    }
   }
 
   public static class ParsedGUI {
     private final ItemStack backgroundItem;
     private final List<Integer> backgroundSlots;
     private final List<Integer> itemSlots;
+    private final Set<ExtraIcon> extraIcons;
     private final String title;
     private final int rows;
 
-    public ParsedGUI(ItemStack backgroundItem, List<Integer> backgroundSlots, List<Integer> itemSlots, String title, int rows) {
+    public ParsedGUI(ItemStack backgroundItem, List<Integer> backgroundSlots, List<Integer> itemSlots, Set<ExtraIcon> extraIcons, String title, int rows) {
       this.backgroundItem = backgroundItem;
       this.backgroundSlots = backgroundSlots;
       this.itemSlots = itemSlots;
+      this.extraIcons = extraIcons;
       this.title = title;
       this.rows = rows;
     }
@@ -62,6 +97,14 @@ public class GUIParser {
       });
       for (Integer slot : backgroundSlots) {
         gui.addButton(slot, bgButton);
+      }
+      for (ExtraIcon extraIcon : extraIcons) {
+        final ItemButton iconButton = ItemButton.create(extraIcon.getIcon(), (e) -> {
+        });
+
+        for (Integer slot : extraIcon.getSlots()) {
+          gui.addButton(slot, iconButton);
+        }
       }
       List<String> items = player.getShopItems();
       boolean changed = items.removeIf(x -> plugin.getShopItemRegistry().get(x) == null);

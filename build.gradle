@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.1.2'
+version = '1.2.0'
 
 repositories {
     mavenCentral()
@@ -48,6 +48,7 @@ dependencies {
     // Helper libs
     implementation 'com.github.cryptomorin:XSeries:11.0.0'
     implementation 'com.github.Redempt:RedLib:6.6.1'
+    implementation 'org.bstats:bstats-bukkit:3.0.2'
 
     // External plugin libs
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'

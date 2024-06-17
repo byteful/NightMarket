@@ -15,6 +15,7 @@ import me.byteful.plugin.nightmarket.util.UpdateChecker;
 import me.byteful.plugin.nightmarket.util.dependency.IsolatedClassLoader;
 import me.byteful.plugin.nightmarket.util.dependency.LibraryLoader;
 import me.clip.placeholderapi.PlaceholderAPI;
+import org.bstats.bukkit.Metrics;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -42,6 +43,7 @@ public final class NightMarketPlugin extends JavaPlugin {
   private Messages messages;
   private BukkitTask updateCheckingTask;
   private ZoneId timezone;
+  private Metrics metrics;
 
   public static NightMarketPlugin getInstance() {
     return instance;
@@ -74,6 +76,9 @@ public final class NightMarketPlugin extends JavaPlugin {
     if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
       new NightMarketPlaceholders(this).register();
     }
+
+    metrics = new Metrics(this, 22301);
+    getLogger().info("Successfully started" + getDescription().getFullName() + "!");
   }
 
   void reloadUpdateChecker() {
@@ -139,6 +144,10 @@ public final class NightMarketPlugin extends JavaPlugin {
 
   @Override
   public void onDisable() {
+    if (metrics != null) {
+      metrics.shutdown();
+    }
+
     if (rotateScheduleManager != null) {
       getRotateScheduleManager().getScheduler().shutdownNow();
     }

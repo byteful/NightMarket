@@ -239,6 +239,16 @@ gui:
   # You may use '-' to indicate to. EX: 1-24 means all slots from 1 to 24.
   item_slots:
     - "10-16"
+  # Any extra icons that you want to display in the GUI.
+  extra_icons:
+    info:
+      name: "&bInformation"
+      lore:
+        - "&7This shop is unique for all players."
+        - "&7This shop rotates on a certain interval."
+      material: PAPER
+      slots:
+        - "22"
 
 # Timezones supported by Java.
 #
