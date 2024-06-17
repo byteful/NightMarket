@@ -86,6 +86,7 @@ items:
         - "&7Buy me pls :)"
         - "&6Price: 6.90"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -101,6 +102,7 @@ items:
         - "&7i am special"
         - "&6Price: 6.90"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: DIRT # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} dirt 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -115,6 +117,7 @@ items:
         - "&7probably an apple"
         - "&6Price: 6.90"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: APPLE # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} apple 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -130,6 +133,7 @@ items:
         - "&7this is definitely not a golden apple"
         - "&6Price: 6.90"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: BLUE_DYE # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} golden_apple 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -145,6 +149,7 @@ items:
         - "&7i am a milk bucket"
         - "&6Price: 6.90"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: MILK_BUCKET # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} milk_bucket 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -160,6 +165,7 @@ items:
         - "&7stickkkkkkkkk"
         - "&6Price: 6.90"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: STICK # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} stick 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -175,6 +181,7 @@ items:
         - "&7u can buy me multiple times unlike the other items!"
         - "&6Price: 6.90"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: DIRT # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
@@ -190,6 +197,7 @@ items:
         - "&7some premium paper."
         - "&6Price: 1 million!"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
+      amount: 1 # The number of items in the GUI slot.
       material: PAPER # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} paper 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name

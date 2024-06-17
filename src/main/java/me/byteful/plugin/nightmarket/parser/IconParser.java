@@ -21,38 +21,41 @@ public class IconParser {
 
     final String name = config.getString("name");
     final List<String> lore = config.getStringList("lore");
+    final int amount = config.getInt("amount", 1);
     final String mat = config.getString("material");
     final String head = config.getString("player_head");
     final Integer customModelData = config.contains("custom_model_data") ? config.getInt("custom_model_data") : null;
 
     if (mat == null && head != null) {
-      return parseHead(name, lore, head, customModelData);
+      return parseHead(name, lore, amount, head, customModelData);
     } else if (mat != null) {
       final ItemStack material = XMaterial.matchXMaterial(mat).orElseThrow(() -> new RuntimeException("Failed to parse material: " + mat)).parseItem();
       Preconditions.checkNotNull(material, "Failed to parse material: " + mat);
       Preconditions.checkArgument(material.getType() != Material.AIR, "Material cannot be AIR!");
-      return parseMaterial(name, lore, material, customModelData);
+      return parseMaterial(name, lore, amount, material, customModelData);
     } else {
       throw new RuntimeException("Failed to find either material or player head for: " + config.getName());
     }
   }
 
-  private static ItemStack parseMaterial(String name, List<String> lore, ItemStack item, Integer customModelData) {
+  private static ItemStack parseMaterial(String name, List<String> lore, int amount, ItemStack item, Integer customModelData) {
     final ItemMeta meta = item.getItemMeta();
     Preconditions.checkNotNull(meta, "Failed to load item's meta.");
     applyMeta(name, lore, customModelData, meta);
     item.setItemMeta(meta);
+    item.setAmount(amount);
 
     return item;
   }
 
-  private static ItemStack parseHead(String name, List<String> lore, String texture, Integer customModelData) {
+  private static ItemStack parseHead(String name, List<String> lore, int amount, String texture, Integer customModelData) {
     final ItemStack item = Objects.requireNonNull(XMaterial.PLAYER_HEAD.parseItem());
     SkullMeta meta = (SkullMeta) item.getItemMeta();
     Preconditions.checkNotNull(meta, "Failed to load item's meta.");
     meta = (SkullMeta) XSkull.of(meta).profile(texture).apply();
     applyMeta(name, lore, customModelData, meta);
     item.setItemMeta(meta);
+    item.setAmount(amount);
 
     return item;
   }
