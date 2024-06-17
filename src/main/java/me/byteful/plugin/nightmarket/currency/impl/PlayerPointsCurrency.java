@@ -1,5 +1,6 @@
 package me.byteful.plugin.nightmarket.currency.impl;
 
+import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
@@ -8,7 +9,12 @@ import org.bukkit.Bukkit;
 import java.util.UUID;
 
 public class PlayerPointsCurrency implements Currency {
-  private transient PlayerPointsAPI eco;
+  private final NightMarketPlugin plugin;
+  private PlayerPointsAPI eco;
+
+  public PlayerPointsCurrency(NightMarketPlugin plugin) {
+    this.plugin = plugin;
+  }
 
   @Override
   public String getId() {
@@ -37,6 +43,6 @@ public class PlayerPointsCurrency implements Currency {
 
   @Override
   public String getName(double amount) {
-    return amount == 1 ? "Token" : "Tokens";
+    return amount == 1 ? plugin.getConfig().getString("default_currencies.playerpoints.name.singular", "Token") : plugin.getConfig().getString("default_currencies.playerpoints.name.plural", "Tokens");
   }
 }

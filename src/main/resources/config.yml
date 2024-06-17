@@ -41,6 +41,17 @@ datastore:
     uri: "mongodb://username:password@host:port"
     database: "NightMarket"
 
+# Configuration for the built-in, default currencies.
+default_currencies:
+  vault:
+    name:
+      singular: "Dollar"
+      plural: "Dollars"
+  playerpoints:
+    name:
+      singular: "Token"
+      plural: "Tokens"
+
 # Configuration for other miscellaneous settings.
 other:
   # Should the GUI close after buying an item?

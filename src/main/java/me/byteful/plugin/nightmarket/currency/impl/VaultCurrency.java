@@ -1,5 +1,6 @@
 package me.byteful.plugin.nightmarket.currency.impl;
 
+import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
@@ -8,7 +9,12 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class VaultCurrency implements Currency {
-  private transient Economy eco;
+  private final NightMarketPlugin plugin;
+  private Economy eco;
+
+  public VaultCurrency(NightMarketPlugin plugin) {
+    this.plugin = plugin;
+  }
 
   @Override
   public String getId() {
@@ -37,6 +43,6 @@ public class VaultCurrency implements Currency {
 
   @Override
   public String getName(double amount) {
-    return amount == 1 ? "Dollar" : "Dollars";
+    return amount == 1 ? plugin.getConfig().getString("default_currencies.vault.name.singular", "Dollar") : plugin.getConfig().getString("default_currencies.vault.name.plural", "Dollars");
   }
 }

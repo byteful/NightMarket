@@ -24,8 +24,8 @@ public class CurrencyRegistry {
     // Let other external plugins know. We delay by a second loading these so other plugins get a chance to handle this and depend on NightMarket properly.
     Bukkit.getPluginManager().callEvent(new CurrencyRegisterEvent(this));
 
-    register(new VaultCurrency());
-    register(new PlayerPointsCurrency());
+    register(new VaultCurrency(plugin));
+    register(new PlayerPointsCurrency(plugin));
     // EcoBits has multiple possible currencies within it, so lets register all of them with the format: 'ecobits:<currency>'
     if (!new EcoBitsCurrency.EcoBitsCurrencyHandler(this).registerAll()) {
       plugin.getLogger().warning("Skipped loading currency adapter: ecobits");
