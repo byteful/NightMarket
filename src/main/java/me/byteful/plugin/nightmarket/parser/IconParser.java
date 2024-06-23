@@ -1,7 +1,8 @@
 package me.byteful.plugin.nightmarket.parser;
 
 import com.cryptomorin.xseries.XMaterial;
-import com.cryptomorin.xseries.XSkull;
+import com.cryptomorin.xseries.profiles.builder.XSkull;
+import com.cryptomorin.xseries.profiles.objects.Profileable;
 import com.google.common.base.Preconditions;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -52,7 +53,7 @@ public class IconParser {
     final ItemStack item = Objects.requireNonNull(XMaterial.PLAYER_HEAD.parseItem());
     SkullMeta meta = (SkullMeta) item.getItemMeta();
     Preconditions.checkNotNull(meta, "Failed to load item's meta.");
-    meta = (SkullMeta) XSkull.of(meta).profile(texture).apply();
+    meta = (SkullMeta) XSkull.of(meta).profile(Profileable.detect(texture)).apply();
     applyMeta(name, lore, customModelData, meta);
     item.setItemMeta(meta);
     item.setAmount(amount);
