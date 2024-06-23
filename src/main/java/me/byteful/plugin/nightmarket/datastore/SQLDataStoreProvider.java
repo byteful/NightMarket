@@ -4,18 +4,17 @@ import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
 import me.byteful.plugin.nightmarket.util.SQLUtils;
 
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
 public abstract class SQLDataStoreProvider implements DataStoreProvider {
-  protected final Connection connection;
+  protected final SQLConnectionProvider connectionProvider;
   protected final String upsertClause;
 
-  public SQLDataStoreProvider(Connection connection, String upsertClause) {
-    this.connection = connection;
+  public SQLDataStoreProvider(SQLConnectionProvider connectionProvider, String upsertClause) {
+    this.connectionProvider = connectionProvider;
     this.upsertClause = upsertClause;
     createTable();
   }
@@ -24,7 +23,7 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
   public void setPlayerShop(PlayerShop shop) {
     final String sql = "INSERT INTO NightMarket (ID, Purchased, Items) VALUES (?, ?, ?) " + upsertClause + " Purchased=?, Items=?;";
 
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+    try (PreparedStatement statement = connectionProvider.get().prepareStatement(sql)) {
       final List<String> purchased = shop.getSerializedPurchasedShopItems();
       final List<String> items = shop.getShopItems();
 
@@ -44,7 +43,7 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
   public Optional<PlayerShop> getPlayerShop(UUID player) {
     final String sql = "SELECT * FROM NightMarket WHERE ID=?;";
 
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+    try (PreparedStatement statement = connectionProvider.get().prepareStatement(sql)) {
       statement.setBytes(1, SQLUtils.serializeUUID(player));
 
       try (ResultSet set = statement.executeQuery()) {
@@ -68,7 +67,7 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
     final Set<PlayerShop> set = new HashSet<>();
     final String sql = "SELECT * FROM NightMarket;";
 
-    try (PreparedStatement statement = connection.prepareStatement(sql); ResultSet result = statement.executeQuery()) {
+    try (PreparedStatement statement = connectionProvider.get().prepareStatement(sql); ResultSet result = statement.executeQuery()) {
       while (result.next()) {
         final UUID uuid = SQLUtils.deserializeUUID(result.getBytes("ID"));
         final List<String> purchased = SQLUtils.deserializeList(result.getString("Purchased"));
@@ -85,18 +84,13 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
 
   @Override
   public boolean test() {
-    try {
-      return !connection.isClosed() && connection.isValid(5);
-    } catch (SQLException e) {
-      e.printStackTrace();
-      return false;
-    }
+    return connectionProvider.isValid();
   }
 
   private void createTable() {
     final String sql = "CREATE TABLE IF NOT EXISTS NightMarket (ID BINARY(16) NOT NULL, Purchased TEXT NOT NULL, Items TEXT NOT NULL, PRIMARY KEY (ID));";
 
-    try (PreparedStatement statement = connection.prepareStatement(sql)) {
+    try (PreparedStatement statement = connectionProvider.get().prepareStatement(sql)) {
       statement.execute();
     } catch (SQLException ex) {
       ex.printStackTrace();
@@ -105,10 +99,6 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
 
   @Override
   public void close() throws IOException {
-    try {
-      connection.close();
-    } catch (SQLException e) {
-      throw new IOException(e);
-    }
+    connectionProvider.close();
   }
 }
