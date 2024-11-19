@@ -18,5 +18,5 @@ permissions:
     default: true
 libraries:
   - org.mongodb:mongo-java-driver:3.12.14
-  - com.mysql:mysql-connector-j:8.4.0
-  - org.xerial:sqlite-jdbc:3.46.0.0
+  - com.mysql:mysql-connector-j:9.0.0
+  - org.xerial:sqlite-jdbc:3.46.0.1

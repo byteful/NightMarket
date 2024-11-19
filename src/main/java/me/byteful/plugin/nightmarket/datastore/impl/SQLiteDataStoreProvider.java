@@ -13,67 +13,67 @@ import java.sql.SQLException;
 import java.util.Properties;
 
 public class SQLiteDataStoreProvider extends SQLDataStoreProvider {
-  public SQLiteDataStoreProvider(IsolatedClassLoader loader, NightMarketPlugin plugin) {
-    super(new SQLiteConnectionProvider(buildConnection(loader, plugin.getDataFolder().toPath().resolve("data.db"))), "ON CONFLICT (ID) DO UPDATE SET");
-  }
-
-  private static Connection buildConnection(IsolatedClassLoader loader, Path path) {
-    if (loader == null) {
-      // We are on a newer version where Spigot loads the library for us.
-      try {
-        Class.forName("org.sqlite.JDBC");
-
-        final Properties properties = new Properties();
-        properties.setProperty("foreign_keys", "on");
-        properties.setProperty("busy_timeout", "1000");
-
-        return DriverManager.getConnection("jdbc:sqlite:" + path.toAbsolutePath(), properties);
-      } catch (SQLException | ClassNotFoundException e) {
-        throw new RuntimeException("Failed to connect to SQLite!", e);
-      }
+    public SQLiteDataStoreProvider(IsolatedClassLoader loader, NightMarketPlugin plugin) {
+        super(new SQLiteConnectionProvider(buildConnection(loader, plugin.getDataFolder().toPath().resolve("data.db"))), "ON CONFLICT (ID) DO UPDATE SET");
     }
 
-    try {
-      final Class<?> connectionClass = loader.loadClass("org.sqlite.jdbc4.JDBC4Connection");
-      final Properties properties = new Properties();
-      properties.setProperty("foreign_keys", "on");
-      properties.setProperty("busy_timeout", "1000");
+    private static Connection buildConnection(IsolatedClassLoader loader, Path path) {
+        if (loader == null) {
+            // We are on a newer version where Spigot loads the library for us.
+            try {
+                Class.forName("org.sqlite.JDBC");
 
-      return (Connection) connectionClass.getConstructor(String.class, String.class, Properties.class).newInstance("jdbc:sqlite:" + path.toString(), path.toString(), properties);
-    } catch (ReflectiveOperationException e) {
-      throw new RuntimeException(e);
-    }
-  }
+                final Properties properties = new Properties();
+                properties.setProperty("foreign_keys", "on");
+                properties.setProperty("busy_timeout", "1000");
 
-  private static final class SQLiteConnectionProvider implements SQLConnectionProvider {
-    private final Connection connection;
+                return DriverManager.getConnection("jdbc:sqlite:" + path.toAbsolutePath(), properties);
+            } catch (SQLException | ClassNotFoundException e) {
+                throw new RuntimeException("Failed to connect to SQLite!", e);
+            }
+        }
 
-    private SQLiteConnectionProvider(Connection connection) {
-      this.connection = connection;
-    }
+        try {
+            final Class<?> connectionClass = loader.loadClass("org.sqlite.jdbc4.JDBC4Connection");
+            final Properties properties = new Properties();
+            properties.setProperty("foreign_keys", "on");
+            properties.setProperty("busy_timeout", "1000");
 
-    @Override
-    public boolean isValid() {
-      try {
-        return !connection.isClosed() && connection.isValid(5);
-      } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
-      }
-    }
-
-    @Override
-    public void close() throws IOException {
-      try {
-        connection.close();
-      } catch (SQLException e) {
-        throw new IOException("Failed to close SQLite connection!", e);
-      }
+            return (Connection) connectionClass.getConstructor(String.class, String.class, Properties.class).newInstance("jdbc:sqlite:" + path.toString(), path.toString(), properties);
+        } catch (ReflectiveOperationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Override
-    public Connection get() {
-      return connection;
+    private static final class SQLiteConnectionProvider implements SQLConnectionProvider {
+        private final Connection connection;
+
+        private SQLiteConnectionProvider(Connection connection) {
+            this.connection = connection;
+        }
+
+        @Override
+        public boolean isValid() {
+            try {
+                return !connection.isClosed() && connection.isValid(5);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        @Override
+        public void close() throws IOException {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                throw new IOException("Failed to close SQLite connection!", e);
+            }
+        }
+
+        @Override
+        public Connection get() {
+            return connection;
+        }
     }
-  }
 }

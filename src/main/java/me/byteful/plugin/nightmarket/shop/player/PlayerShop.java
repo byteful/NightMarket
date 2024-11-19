@@ -72,9 +72,15 @@ public class PlayerShop {
 
   public void purchaseItem(ShopItem item) {
     purchasedShopItems.merge(item.getId(), 1, Integer::sum);
+    NightMarketPlugin.getInstance().getPlayerShopManager().getGlobalPurchaseCount().merge(item.getId(), 1, Integer::sum);
     final OfflinePlayer player = Bukkit.getOfflinePlayer(uniqueId);
-    final String cmd = item.getCommand().startsWith("/") ? item.getCommand().substring(1) : item.getCommand();
-    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Text.format(player, cmd.replace("{player}", Objects.requireNonNull(player.getName()))));
+
+    for (String cmd : item.getCommands()) {
+      cmd = cmd.startsWith("/") ? cmd.substring(1) : cmd;
+      cmd = cmd.replace("{player}", Objects.requireNonNull(player.getName()));
+      Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Text.format(player, cmd));
+    }
+
     item.getCurrency().withdraw(uniqueId, item.getAmount());
     NightMarketPlugin.getInstance().debug("Player purchased item: " + item.getId() + " (" + uniqueId + ")");
   }

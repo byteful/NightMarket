@@ -10,64 +10,64 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CurrencyRegistry {
-  private final Map<String, Currency> currencies = new HashMap<>();
-  private final NightMarketPlugin plugin;
-  private boolean isLoaded = false;
+    private final Map<String, Currency> currencies = new HashMap<>();
+    private final NightMarketPlugin plugin;
+    private boolean isLoaded = false;
 
-  public CurrencyRegistry(NightMarketPlugin plugin) {
-    this.plugin = plugin;
-    Bukkit.getScheduler().runTaskLater(plugin, this::load, 20L);
-  }
-
-  private void load() {
-    plugin.getLogger().info("Loading NightMarket currency adapters...");
-    // Let other external plugins know. We delay by a second loading these so other plugins get a chance to handle this and depend on NightMarket properly.
-    Bukkit.getPluginManager().callEvent(new CurrencyRegisterEvent(this));
-
-    register(new VaultCurrency(plugin));
-    register(new PlayerPointsCurrency(plugin));
-    // EcoBits has multiple possible currencies within it, so lets register all of them with the format: 'ecobits:<currency>'
-    if (!new EcoBitsCurrency.EcoBitsCurrencyHandler(this).registerAll()) {
-      plugin.getLogger().warning("Skipped loading currency adapter: ecobits");
+    public CurrencyRegistry(NightMarketPlugin plugin) {
+        this.plugin = plugin;
+        Bukkit.getScheduler().runTaskLater(plugin, this::load, 20L);
     }
 
-    isLoaded = true;
-    plugin.getLogger().info("Done loading currencies!");
+    private void load() {
+        plugin.getLogger().info("Loading NightMarket currency adapters...");
+        // Let other external plugins know. We delay by a second loading these so other plugins get a chance to handle this and depend on NightMarket properly.
+        Bukkit.getPluginManager().callEvent(new CurrencyRegisterEvent(this));
 
-    plugin.getShopItemRegistry().load(); // Have to load items after currencies are loaded.
-    plugin.getRotateScheduleManager().load();
+        register(new VaultCurrency(plugin));
+        register(new PlayerPointsCurrency(plugin));
+        // EcoBits has multiple possible currencies within it, so lets register all of them with the format: 'ecobits:<currency>'
+        if (!new EcoBitsCurrency.EcoBitsCurrencyHandler(this).registerAll()) {
+            plugin.getLogger().warning("Skipped loading currency adapter: ecobits");
+        }
 
-    Bukkit.getOnlinePlayers().forEach(p -> plugin.getPlayerShopManager().load(p.getUniqueId()));
-  }
+        isLoaded = true;
+        plugin.getLogger().info("Done loading currencies!");
 
-  public Currency get(String id) {
-    return currencies.get(id.toLowerCase());
-  }
+        plugin.getShopItemRegistry().load(); // Have to load items after currencies are loaded.
+        plugin.getRotateScheduleManager().load();
 
-  public void register(Currency currency) {
-    if (currency.canLoad()) {
-      currency.load();
-      plugin.getLogger().info("Registered currency adapter: " + currency.getId());
-    } else {
-      plugin.getLogger().warning("Skipped loading currency adapter: " + currency.getId());
+        Bukkit.getOnlinePlayers().forEach(p -> plugin.getPlayerShopManager().load(p.getUniqueId()));
     }
 
-    currencies.put(currency.getId().toLowerCase(), currency);
-  }
+    public Currency get(String id) {
+        return currencies.get(id.toLowerCase());
+    }
 
-  public void unregister(Currency currency) {
-    unregister(currency.getId());
-  }
+    public void register(Currency currency) {
+        if (currency.canLoad()) {
+            currency.load();
+            plugin.getLogger().info("Registered currency adapter: " + currency.getId());
+        } else {
+            plugin.getLogger().warning("Skipped loading currency adapter: " + currency.getId());
+        }
 
-  public void unregister(String id) {
-    currencies.remove(id.toLowerCase());
-  }
+        currencies.put(currency.getId().toLowerCase(), currency);
+    }
 
-  public Map<String, Currency> getCurrencies() {
-    return currencies;
-  }
+    public void unregister(Currency currency) {
+        unregister(currency.getId());
+    }
 
-  public boolean isLoaded() {
-    return isLoaded;
-  }
+    public void unregister(String id) {
+        currencies.remove(id.toLowerCase());
+    }
+
+    public Map<String, Currency> getCurrencies() {
+        return currencies;
+    }
+
+    public boolean isLoaded() {
+        return isLoaded;
+    }
 }

@@ -13,6 +13,10 @@ nightmarketadmin,adminnightmarket,nmarketadmin,nightmarket-admin {
     hook forcerotate
     help Forcefully rotate provided player's NightMarket shop.
   }
+  forceglobalrotate {
+    hook forceglobalrotate
+    help Forcefully rotates all shops.
+  }
   debug {
     hook debug
     help Provides debug information to give to support.

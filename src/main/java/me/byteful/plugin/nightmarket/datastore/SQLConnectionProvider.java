@@ -5,5 +5,5 @@ import java.sql.Connection;
 import java.util.function.Supplier;
 
 public interface SQLConnectionProvider extends Closeable, Supplier<Connection> {
-  boolean isValid();
+    boolean isValid();
 }

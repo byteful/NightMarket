@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.2.0.2'
+version = '1.2.1'
 
 repositories {
     mavenCentral()
@@ -46,7 +46,7 @@ dependencies {
     compileOnly 'com.mojang:authlib:1.5.21'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:11.1.0'
+    implementation 'com.github.cryptomorin:XSeries:11.2.0.1'
     implementation 'com.github.Redempt:RedLib:6.6.1'
     implementation 'org.bstats:bstats-bukkit:3.0.2'
     implementation 'com.zaxxer:HikariCP:4.0.3'
@@ -55,12 +55,12 @@ dependencies {
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'org.black_ixx:playerpoints:3.2.7'
-    compileOnly 'com.github.Auxilor:EcoBits:9679e84fd2' // 1.8.4
+    compileOnly 'com.github.Auxilor:EcoBits:1.8.4'
 
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
     compileOnly 'org.mongodb:mongo-java-driver:3.12.14'
-    compileOnly 'com.mysql:mysql-connector-j:8.4.0'
-    compileOnly 'org.xerial:sqlite-jdbc:3.46.0.0'
+    compileOnly 'com.mysql:mysql-connector-j:9.0.0'
+    compileOnly 'org.xerial:sqlite-jdbc:3.46.0.1'
 }
 
 def targetJavaVersion = 8
