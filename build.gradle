@@ -59,7 +59,7 @@ dependencies {
 
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
     compileOnly 'org.mongodb:mongo-java-driver:3.12.14'
-    compileOnly 'com.mysql:mysql-connector-j:9.0.0'
+    compileOnly 'com.mysql:mysql-connector-j:9.1.0'
     compileOnly 'org.xerial:sqlite-jdbc:3.46.0.1'
 }
 
