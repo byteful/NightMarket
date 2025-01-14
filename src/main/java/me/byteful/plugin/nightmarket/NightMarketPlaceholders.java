@@ -77,6 +77,10 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
                 return getCountdown(plugin.getAccessScheduleManager().getNextTime());
             }
 
+            case "timezone": {
+                return plugin.getTimezone().toString();
+            }
+
             default: {
                 return null;
             }
