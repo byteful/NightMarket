@@ -27,7 +27,7 @@ public class IconParser {
         final String head = config.getString("player_head");
         final Integer customModelData = config.contains("custom_model_data") ? config.getInt("custom_model_data") : null;
 
-        if (mat == null && head != null) {
+        if (head != null && !head.isEmpty()) {
             return parseHead(name, lore, amount, head, customModelData);
         } else if (mat != null) {
             final ItemStack material = XMaterial.matchXMaterial(mat).orElseThrow(() -> new RuntimeException("Failed to parse material: " + mat)).parseItem();

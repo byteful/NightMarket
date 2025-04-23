@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.2.1.1'
+version = '1.2.1.2'
 
 repositories {
     mavenCentral()
@@ -42,19 +42,19 @@ repositories {
 
 dependencies {
     // Spigot/Minecraft libs
-    compileOnly 'org.spigotmc:spigot-api:1.20.6-R0.1-SNAPSHOT'
+    compileOnly 'org.spigotmc:spigot-api:1.21.5-R0.1-SNAPSHOT'
     compileOnly 'com.mojang:authlib:1.5.21'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:11.2.0.1'
+    implementation 'com.github.cryptomorin:XSeries:13.2.0'
     implementation 'com.github.Redempt:RedLib:6.6.1'
-    implementation 'org.bstats:bstats-bukkit:3.0.2'
+    implementation 'org.bstats:bstats-bukkit:3.1.0'
     implementation 'com.zaxxer:HikariCP:4.0.3'
 
     // External plugin libs
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
-    compileOnly 'org.black_ixx:playerpoints:3.2.7'
+    compileOnly 'org.black_ixx:playerpoints:3.3.2'
     compileOnly 'com.github.Auxilor:EcoBits:1.8.4'
 
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
@@ -89,7 +89,9 @@ processResources {
 }
 
 shadowJar {
-    minimize()
+    minimize {
+        exclude(dependency("com.github.cryptomorin:XSeries:.*"))
+    }
     archiveBaseName.set("NightMarket")
     archiveClassifier.set("")
 
