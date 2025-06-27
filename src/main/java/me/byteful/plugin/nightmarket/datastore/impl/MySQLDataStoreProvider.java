@@ -23,7 +23,7 @@ public class MySQLDataStoreProvider extends SQLDataStoreProvider {
 
         private MySQLConnectionProvider(String jdbcURL, String user, String pass) {
             final HikariConfig config = new HikariConfig();
-            config.setDriverClassName("com.mysql.jdbc.Driver");
+            config.setDriverClassName("com.mysql.cj.jdbc.Driver");
             config.setJdbcUrl(jdbcURL);
             config.setUsername(user);
             config.setPassword(pass);

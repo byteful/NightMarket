@@ -8,14 +8,13 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerShopManager implements Listener {
-    private final Map<UUID, PlayerShop> loadedShops = new HashMap<>();
+    private final Map<UUID, PlayerShop> loadedShops = new ConcurrentHashMap<>();
     private final Map<String, Integer> globalPurchaseCount = new ConcurrentHashMap<>();
     private final NightMarketPlugin plugin;
 
@@ -41,7 +40,7 @@ public class PlayerShopManager implements Listener {
 
 //    plugin.debug("Updating global purchase count.");
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            final Map<String, Integer> copy = new HashMap<>();
+            final Map<String, Integer> copy = new ConcurrentHashMap<>();
             final Set<PlayerShop> shops = plugin.getDataStoreProvider().getAllShops();
             for (ShopItem item : plugin.getShopItemRegistry().getAll()) {
                 final int totalPurchases = shops.stream().mapToInt(shop -> shop.getPurchaseCount(item.getId())).sum();
@@ -56,13 +55,11 @@ public class PlayerShopManager implements Listener {
     }
 
     public PlayerShop get(UUID uuid) {
-        if (loadedShops.containsKey(uuid)) return loadedShops.get(uuid);
-
-        final PlayerShop created = new PlayerShop(plugin.getShopItemRegistry(), uuid);
-        loadedShops.put(uuid, created);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDataStoreProvider().setPlayerShop(created));
-
-        return created;
+        return loadedShops.computeIfAbsent(uuid, key -> {
+            final PlayerShop created = plugin.getDataStoreProvider().getPlayerShop(key).orElseGet(() -> new PlayerShop(plugin.getShopItemRegistry(), key));
+            Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDataStoreProvider().setPlayerShop(created));
+            return created;
+        });
     }
 
     public int getGlobalPurchaseCount(ShopItem item) {

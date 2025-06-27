@@ -5,6 +5,7 @@ import me.byteful.plugin.nightmarket.schedule.ScheduleType;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -15,10 +16,11 @@ import static me.byteful.plugin.nightmarket.schedule.ScheduleUtils.getDateNeares
 
 public class AccessScheduleManager {
     private final Set<AccessSchedule> schedules = new HashSet<>();
+    private final ScheduleType mode;
 
     public AccessScheduleManager(NightMarketPlugin plugin) {
         final ConfigurationSection config = plugin.getConfig().getConfigurationSection("access_schedule");
-        final ScheduleType mode = ScheduleType.fromName(config.getString("mode"));
+        mode = ScheduleType.fromName(config.getString("mode"));
         List<Map<?, ?>> scheduleMap;
 
         if (mode == ScheduleType.DATE) {
@@ -45,8 +47,24 @@ public class AccessScheduleManager {
             return now;
         }
 
-        System.out.println(schedules.stream().map(AccessSchedule::getStart).collect(Collectors.toList()));
+        List<LocalDateTime> startTimes = schedules.stream()
+                .map(s -> s.getStart(now))
+                .collect(Collectors.toList());
 
-        return getDateNearest(schedules.stream().map(AccessSchedule::getStart).collect(Collectors.toList()), now);
+        if (mode == ScheduleType.TIMES) {
+            final List<LocalDateTime> adjusted = new ArrayList<>();
+            for (final LocalDateTime start : startTimes) {
+                if (start.isBefore(now)) {
+                    adjusted.add(start.plusDays(1));
+                } else {
+                    adjusted.add(start);
+                }
+            }
+            startTimes = adjusted;
+        }
+
+        final List<LocalDateTime> futureStarts = startTimes.stream().filter(s -> s.isAfter(now)).collect(Collectors.toList());
+
+        return getDateNearest(futureStarts, now);
     }
 }

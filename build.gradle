@@ -1,11 +1,10 @@
 plugins {
     id 'java'
-    id 'idea'
-    id "com.github.johnrengelman.shadow" version "7.1.2"
+    id("com.gradleup.shadow") version "9.0.0-beta15"
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.2.1.2'
+version = '1.2.1.3-BETA'
 
 repositories {
     mavenCentral()
@@ -16,10 +15,6 @@ repositories {
     maven {
         name = 'sonatype'
         url = 'https://oss.sonatype.org/content/groups/public/'
-    }
-    maven {
-        name = 'jitpack'
-        url = 'https://jitpack.io'
     }
     maven {
         name = 'redempt'
@@ -38,6 +33,10 @@ repositories {
     maven {
         url = 'https://libraries.minecraft.net/'
     }
+    maven {
+        name = 'jitpack'
+        url = 'https://jitpack.io'
+    }
 }
 
 dependencies {
@@ -46,7 +45,7 @@ dependencies {
     compileOnly 'com.mojang:authlib:1.5.21'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:13.2.0'
+    implementation 'com.github.cryptomorin:XSeries:13.3.1'
     implementation 'com.github.Redempt:RedLib:6.6.1'
     implementation 'org.bstats:bstats-bukkit:3.1.0'
     implementation 'com.zaxxer:HikariCP:4.0.3'
@@ -83,7 +82,7 @@ processResources {
     def props = [version: version]
     inputs.properties props
     filteringCharset 'UTF-8'
-    filesMatching('*.yml') {
+    filesMatching('plugin.yml') {
         expand props
     }
 }
@@ -94,9 +93,13 @@ shadowJar {
     }
     archiveBaseName.set("NightMarket")
     archiveClassifier.set("")
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 
     relocate 'com.cryptomorin.xseries', 'me.byteful.plugin.nightmarket.libs.xseries'
     relocate 'redempt', 'me.byteful.plugin.nightmarket.libs.redempt'
     relocate 'org.bstats', 'me.byteful.plugin.nightmarket.libs.bstats'
     relocate 'com.zaxxer.hikari', 'me.byteful.plugin.nightmarket.libs.hikaricp'
+
+    exclude("command.rdcml")
+    exclude("org/slf4j/**")
 }

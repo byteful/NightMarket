@@ -17,6 +17,11 @@ public enum ScheduleType {
             return LocalDateTime.parse(str, format);
             //return format.parse(str, Instant::from);
         }
+
+        @Override
+        public LocalTime parseTime(String str) {
+            throw new UnsupportedOperationException("Date schematics do not support parsing only time!");
+        }
     },
     TIMES {
         private final DateTimeFormatter format = DateTimeFormatter.ofPattern("hh:mm:ss a", Locale.US).withZone(NightMarketPlugin.getInstance().getTimezone());
@@ -26,6 +31,11 @@ public enum ScheduleType {
             return LocalTime.parse(str, format).atDate(LocalDate.now());
             //return format.parse(str, Instant::from);
         }
+
+        @Override
+        public LocalTime parseTime(String str) {
+            return LocalTime.parse(str, format);
+        }
     };
 
     public static ScheduleType fromName(String str) {
@@ -34,6 +44,10 @@ public enum ScheduleType {
         } catch (Exception e) {
             throw new RuntimeException("Please use either DATE or TIMES for your schedule modes!", e);
         }
+    }
+
+    public LocalTime parseTime(String str) {
+        throw new UnsupportedOperationException("Time parsing is not supported for all schedule types!");
     }
 
     public abstract LocalDateTime parse(String str);
