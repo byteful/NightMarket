@@ -63,6 +63,8 @@ public class Text {
      * @return a cloned, formatted, and specialized ItemStack from the provided placeholders and PlaceholderAPI
      */
     public static ItemStack specializeItem(Player player, ItemStack item, String... replacements) {
+        if (player == null) return item;
+
         item = item.clone();
         final ItemMeta meta = item.getItemMeta();
         if (meta == null) return item;

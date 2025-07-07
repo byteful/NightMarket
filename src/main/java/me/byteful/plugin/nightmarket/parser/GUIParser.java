@@ -89,6 +89,8 @@ public class GUIParser {
         }
 
         public InventoryGUI build(PlayerShop player, NightMarketPlugin plugin) {
+            final Player bp = Bukkit.getPlayer(player.getUniqueId());
+
             plugin.debug("Building NightMarket GUI for: " + player.getUniqueId());
             plugin.debug("Items list: " + String.join(",", player.getShopItems()));
             plugin.debug("Purchased items list: " + String.join(",", player.getPurchasedShopItems().keySet()));
@@ -99,7 +101,7 @@ public class GUIParser {
                 gui.addButton(slot, bgButton);
             }
             for (ExtraIcon extraIcon : extraIcons) {
-                final ItemButton iconButton = ItemButton.create(extraIcon.getIcon(), (e) -> {
+                final ItemButton iconButton = ItemButton.create(Text.specializeItem(bp, extraIcon.getIcon()), (e) -> {
                 });
 
                 for (Integer slot : extraIcon.getSlots()) {
@@ -145,7 +147,6 @@ public class GUIParser {
                 final int purchased = globalCheck ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(item.getId());
                 final int stock = item.getPurchaseLimit();
 
-                final Player bp = Bukkit.getPlayer(player.getUniqueId());
                 ItemStack isIcon;
 
                 if (bp != null && bp.isOnline()) {

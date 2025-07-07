@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.2.1.3-BETA'
+version = '1.2.2'
 
 repositories {
     mavenCentral()
@@ -45,7 +45,7 @@ dependencies {
     compileOnly 'com.mojang:authlib:1.5.21'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:13.3.1'
+    implementation 'com.github.cryptomorin:XSeries:13.3.3'
     implementation 'com.github.Redempt:RedLib:6.6.1'
     implementation 'org.bstats:bstats-bukkit:3.1.0'
     implementation 'com.zaxxer:HikariCP:4.0.3'
