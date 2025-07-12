@@ -9,6 +9,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 import redempt.redlib.inventorygui.InventoryGUI;
 import redempt.redlib.inventorygui.ItemButton;
 import redempt.redlib.misc.WeightedRandom;
@@ -21,8 +23,9 @@ import static me.byteful.plugin.nightmarket.util.Text.color;
 
 public class GUIParser {
     public static ParsedGUI parse(ConfigurationSection config) {
-        final String title = config.getString("title");
-        final int rows = config.getInt("rows");
+        final String title = config.getString("title", "NightMarket");
+        final int rows = config.getInt("rows", 3);
+        final int updateFrequency = config.getInt("update", -1);
         Preconditions.checkArgument(rows > 0 && rows < 7, "Rows needs to be greater than 0 and less than 7!");
         final ItemStack backgroundIcon = IconParser.parse(config.getConfigurationSection("background_icon"));
         final List<String> backgroundSlots = config.getStringList("background_slots");
@@ -42,7 +45,7 @@ public class GUIParser {
             });
         }
 
-        return new ParsedGUI(backgroundIcon, SlotNumberParser.parse(backgroundSlots), SlotNumberParser.parse(itemSlots), extraIcons, title, rows);
+        return new ParsedGUI(backgroundIcon, SlotNumberParser.parse(backgroundSlots), SlotNumberParser.parse(itemSlots), extraIcons, title, rows, updateFrequency);
     }
 
     public static class ExtraIcon {
@@ -70,14 +73,16 @@ public class GUIParser {
         private final Set<ExtraIcon> extraIcons;
         private final String title;
         private final int rows;
+        private final int updateFrequency;
 
-        public ParsedGUI(ItemStack backgroundItem, List<Integer> backgroundSlots, List<Integer> itemSlots, Set<ExtraIcon> extraIcons, String title, int rows) {
+        public ParsedGUI(ItemStack backgroundItem, List<Integer> backgroundSlots, List<Integer> itemSlots, Set<ExtraIcon> extraIcons, String title, int rows, int updateFrequency) {
             this.backgroundItem = backgroundItem;
             this.backgroundSlots = backgroundSlots;
             this.itemSlots = itemSlots;
             this.extraIcons = extraIcons;
             this.title = title;
             this.rows = rows;
+            this.updateFrequency = updateFrequency;
         }
 
         public List<Integer> getItemSlots() {
@@ -97,17 +102,26 @@ public class GUIParser {
             final InventoryGUI gui = new InventoryGUI(rows * 9, getTitle());
             final ItemButton bgButton = ItemButton.create(backgroundItem, (e) -> {
             });
-            for (Integer slot : backgroundSlots) {
-                gui.addButton(slot, bgButton);
-            }
-            for (ExtraIcon extraIcon : extraIcons) {
-                final ItemButton iconButton = ItemButton.create(Text.specializeItem(bp, extraIcon.getIcon()), (e) -> {
-                });
 
-                for (Integer slot : extraIcon.getSlots()) {
-                    gui.addButton(slot, iconButton);
+            final Runnable reloadBackground = () -> {
+                for (Integer slot : backgroundSlots) {
+                    gui.addButton(slot, bgButton);
                 }
-            }
+            };
+            reloadBackground.run();
+
+            final Runnable reloadExtraIcons = () -> {
+                for (ExtraIcon extraIcon : extraIcons) {
+                    final ItemButton iconButton = ItemButton.create(Text.specializeItem(bp, extraIcon.getIcon()), (e) -> {
+                    });
+
+                    for (Integer slot : extraIcon.getSlots()) {
+                        gui.addButton(slot, iconButton);
+                    }
+                }
+            };
+            reloadExtraIcons.run();
+
             List<String> items = player.getShopItems();
             boolean changed = items.removeIf(x -> plugin.getShopItemRegistry().get(x) == null);
             if (items.size() > itemSlots.size()) {
@@ -139,58 +153,84 @@ public class GUIParser {
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDataStoreProvider().setPlayerShop(player));
                 plugin.debug("Updated items to DB: " + String.join(",", items));
             }
-            for (int i = 0; i < itemSlots.size(); i++) {
-                final Integer slot = itemSlots.get(i);
-                final ShopItem item = plugin.getShopItemRegistry().get(items.get(i));
 
-                final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
-                final int purchased = globalCheck ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(item.getId());
-                final int stock = item.getPurchaseLimit();
+            final List<String> finalItems = items;
 
-                ItemStack isIcon;
+            final Runnable reloadItemIcons = () -> {
+                for (int i = 0; i < itemSlots.size(); i++) {
+                    final Integer slot = itemSlots.get(i);
+                    final ShopItem item = plugin.getShopItemRegistry().get(finalItems.get(i));
 
-                if (bp != null && bp.isOnline()) {
-                    isIcon = Text.specializeItem(bp, item.getIcon(), "{stock}", stock == Integer.MAX_VALUE ? "∞" : "" + stock, "{purchase_count}", "" + purchased);
-                } else {
-                    isIcon = item.getIcon();
-                }
+                    final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
+                    final int purchased = globalCheck ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(item.getId());
+                    final int stock = item.getPurchaseLimit();
 
-                gui.addButton(slot, ItemButton.create(isIcon, e -> {
-                    plugin.debug("Clicked GUI button: " + e.getWhoClicked().getName());
-                    if (!(e.getWhoClicked() instanceof Player)) {
-                        return;
+                    ItemStack isIcon;
+
+                    if (bp != null && bp.isOnline()) {
+                        isIcon = Text.specializeItem(bp, item.getIcon(), "{stock}", stock == Integer.MAX_VALUE ? "∞" : "" + stock, "{purchase_count}", "" + purchased);
+                    } else {
+                        isIcon = item.getIcon();
                     }
 
-                    // Recheck these variables in case of time delay between icon creation and execution.
-                    final boolean globalPurchaseLimits = plugin.getConfig().getBoolean("other.global_purchase_limits");
-                    final int purchaseCount = globalPurchaseLimits ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(item.getId());
-                    final String messageKey = globalPurchaseLimits ? "item_max_global_purchases" : "already_purchased";
-
-                    if (purchaseCount >= item.getPurchaseLimit()) {
-                        e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), messageKey));
-                        e.getWhoClicked().closeInventory();
-                        return;
-                    }
-
-                    if (!item.getCurrency().canPlayerAfford(player.getUniqueId(), item.getAmount())) {
-                        String currencyName = item.getCurrency().getName(item.getAmount());
-                        if (plugin.getConfig().getBoolean("other.lowercase_currency_names")) {
-                            currencyName = currencyName.toLowerCase();
+                    gui.addButton(slot, ItemButton.create(isIcon, e -> {
+                        plugin.debug("Clicked GUI button: " + e.getWhoClicked().getName());
+                        if (!(e.getWhoClicked() instanceof Player)) {
+                            return;
                         }
 
-                        e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "cannot_afford").replace("{amount}", Text.formatCurrency(item.getAmount())).replace("{currency}", currencyName));
-                        e.getWhoClicked().closeInventory();
+                        // Recheck these variables in case of time delay between icon creation and execution.
+                        final boolean globalPurchaseLimits = plugin.getConfig().getBoolean("other.global_purchase_limits");
+                        final int purchaseCount = globalPurchaseLimits ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(item.getId());
+                        final String messageKey = globalPurchaseLimits ? "item_max_global_purchases" : "already_purchased";
 
-                        return;
-                    }
+                        if (purchaseCount >= item.getPurchaseLimit()) {
+                            e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), messageKey));
+                            e.getWhoClicked().closeInventory();
+                            return;
+                        }
 
-                    player.purchaseItem(item);
-                    Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDataStoreProvider().setPlayerShop(player));
-                    if (plugin.getConfig().getBoolean("other.close_on_buy")) {
-                        e.getWhoClicked().closeInventory();
+                        if (!item.getCurrency().canPlayerAfford(player.getUniqueId(), item.getAmount())) {
+                            String currencyName = item.getCurrency().getName(item.getAmount());
+                            if (plugin.getConfig().getBoolean("other.lowercase_currency_names")) {
+                                currencyName = currencyName.toLowerCase();
+                            }
+
+                            e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "cannot_afford").replace("{amount}", Text.formatCurrency(item.getAmount())).replace("{currency}", currencyName));
+                            e.getWhoClicked().closeInventory();
+
+                            return;
+                        }
+
+                        player.purchaseItem(item);
+                        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> plugin.getDataStoreProvider().setPlayerShop(player));
+                        if (plugin.getConfig().getBoolean("other.close_on_buy")) {
+                            e.getWhoClicked().closeInventory();
+                        }
+                        e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "successfully_purchased_item").replace("{item}", item.getId()));
+                    }));
+                }
+            };
+            reloadItemIcons.run();
+
+            if (updateFrequency > 0) {
+                final BukkitTask updateTask = new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        if (isCancelled() || gui.getInventory() == null || gui.getInventory().isEmpty()) {
+                            cancel();
+                            return;
+                        }
+
+                        gui.clear();
+                        reloadBackground.run();
+                        reloadExtraIcons.run();
+                        reloadItemIcons.run();
+                        gui.update();
                     }
-                    e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "successfully_purchased_item").replace("{item}", item.getId()));
-                }));
+                }.runTaskTimer(plugin, updateFrequency, updateFrequency);
+
+                gui.setOnDestroy(updateTask::cancel);
             }
 
             return gui;

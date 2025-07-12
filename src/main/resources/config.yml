@@ -285,6 +285,9 @@ gui:
   title: "&6NightMarket"
   # Number of rows in the GUI
   rows: 3
+  # The frequency (in ticks) that this GUI should be refreshed (useful for live placeholders). Set to -1 to disable refreshing. Set to 20 to refresh every second.
+  # Recommended to do 20 ticks so it puts less load on your server.
+  update: -1
   # The GUI slots that will be populated with the background_icon item.
   # You may use '-' to indicate to. EX: 1-24 means all slots from 1 to 24.
   background_slots:
