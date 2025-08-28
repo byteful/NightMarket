@@ -9,3 +9,4 @@ shop_loading: &cSorry, but the shop is still loading! Please wait and try again 
 no_permission: &cYou do not have permission to execute this command!
 item_max_global_purchases: &cThis item is out of stock!
 force_rotated_all: &aForcefully rotated all shops!
+infinite_stock: &f∞
