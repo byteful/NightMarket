@@ -53,31 +53,31 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
             return null;
         }
 
-        params = params.toLowerCase().trim().replace(" ", "_");
+        params = params.trim().replace(" ", "_");
 
         if (params.startsWith("stock_")) {
             final String itemId = params.substring(6);
             final ShopItem item = plugin.getShopItemRegistry().get(itemId);
-            
+
             if (item == null) {
                 return null;
             }
-            
+
             final int limit = item.getPurchaseLimit();
             if (limit == Integer.MAX_VALUE) {
                 return plugin.getMessage(null, "infinite_stock");
             }
-            
+
             final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
-            final int purchased = globalCheck 
-                ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item)
-                : shop.getPurchasedShopItems().getOrDefault(itemId, 0);
-            
+            final int purchased = globalCheck
+                    ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item)
+                    : shop.getPurchasedShopItems().getOrDefault(itemId, 0);
+
             final int remaining = Math.max(0, limit - purchased);
             return String.valueOf(remaining);
         }
 
-        switch (params) {
+        switch (params.toLowerCase()) {
             case "purchased_items_count": {
                 return String.valueOf(shop.getPurchasedShopItems().size());
             }

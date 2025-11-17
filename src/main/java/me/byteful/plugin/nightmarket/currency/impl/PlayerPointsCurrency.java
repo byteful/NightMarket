@@ -2,6 +2,7 @@ package me.byteful.plugin.nightmarket.currency.impl;
 
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.Currency;
+import me.byteful.plugin.nightmarket.util.Text;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
@@ -43,6 +44,6 @@ public class PlayerPointsCurrency implements Currency {
 
     @Override
     public String getName(double amount) {
-        return amount == 1 ? plugin.getConfig().getString("default_currencies.playerpoints.name.singular", "Token") : plugin.getConfig().getString("default_currencies.playerpoints.name.plural", "Tokens");
+        return Text.formatCurrency(amount) + " " + (amount == 1 ? plugin.getConfig().getString("default_currencies.playerpoints.name.singular", "Token") : plugin.getConfig().getString("default_currencies.playerpoints.name.plural", "Tokens"));
     }
 }

@@ -29,10 +29,6 @@ public class RotateScheduleManager {
         this.plugin = plugin;
     }
 
-    public ScheduledExecutorService getScheduler() {
-        return scheduler;
-    }
-
     private static @NotNull List<String> getSchedules(ScheduleType mode, ConfigurationSection config) {
         List<String> schedules;
 
@@ -45,6 +41,10 @@ public class RotateScheduleManager {
         }
 
         return schedules;
+    }
+
+    public ScheduledExecutorService getScheduler() {
+        return scheduler;
     }
 
     public void rotate() {

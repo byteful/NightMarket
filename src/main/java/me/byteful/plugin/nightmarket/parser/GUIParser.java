@@ -191,12 +191,12 @@ public class GUIParser {
                         }
 
                         if (!item.getCurrency().canPlayerAfford(player.getUniqueId(), item.getAmount())) {
-                            String currencyName = item.getCurrency().getName(item.getAmount());
+                            String formatted = item.getCurrency().format(item.getAmount());
                             if (plugin.getConfig().getBoolean("other.lowercase_currency_names")) {
-                                currencyName = currencyName.toLowerCase();
+                                formatted = formatted.toLowerCase();
                             }
 
-                            e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "cannot_afford").replace("{amount}", Text.formatCurrency(item.getAmount())).replace("{currency}", currencyName));
+                            e.getWhoClicked().sendMessage(plugin.getMessage((Player) e.getWhoClicked(), "cannot_afford").replace("{amount}", formatted).replace("{currency}", "")); // Replace currency placeholder for legacy support
                             e.getWhoClicked().closeInventory();
 
                             return;

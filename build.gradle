@@ -1,10 +1,10 @@
 plugins {
     id 'java'
-    id("com.gradleup.shadow") version "9.0.0-beta15"
+    id("com.gradleup.shadow") version "9.2.2"
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.2.3'
+version = '1.2.4'
 
 repositories {
     mavenCentral()
@@ -37,6 +37,10 @@ repositories {
         name = 'jitpack'
         url = 'https://jitpack.io'
     }
+    maven {
+        name = 'coinsengine'
+        url = 'https://repo.nightexpressdev.com/releases'
+    }
 }
 
 dependencies {
@@ -45,7 +49,7 @@ dependencies {
     compileOnly 'com.mojang:authlib:1.5.21'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:13.3.3'
+    implementation 'com.github.cryptomorin:XSeries:13.5.1'
     implementation 'com.github.Redempt:RedLib:6.6.1'
     implementation 'org.bstats:bstats-bukkit:3.1.0'
     implementation 'com.zaxxer:HikariCP:4.0.3'
@@ -55,6 +59,7 @@ dependencies {
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'org.black_ixx:playerpoints:3.3.2'
     compileOnly 'com.github.Auxilor:EcoBits:1.8.4'
+    compileOnly 'su.nightexpress.coinsengine:CoinsEngine:2.6.0'
 
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
     compileOnly 'org.mongodb:mongo-java-driver:3.12.14'

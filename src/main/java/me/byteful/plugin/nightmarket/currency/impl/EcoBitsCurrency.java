@@ -4,6 +4,7 @@ import com.willfp.ecobits.currencies.Currencies;
 import com.willfp.ecobits.currencies.CurrencyUtils;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import me.byteful.plugin.nightmarket.currency.CurrencyRegistry;
+import me.byteful.plugin.nightmarket.util.Text;
 import org.bukkit.Bukkit;
 
 import java.math.BigDecimal;
@@ -43,7 +44,7 @@ public class EcoBitsCurrency implements Currency {
 
     @Override
     public String getName(double amount) {
-        return amount + " " + adapter.getName();
+        return Text.formatCurrency(amount) + " " + adapter.getName();
     }
 
     public static class EcoBitsCurrencyHandler {

@@ -2,6 +2,7 @@ package me.byteful.plugin.nightmarket.currency.impl;
 
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.Currency;
+import me.byteful.plugin.nightmarket.util.Text;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 
@@ -43,6 +44,6 @@ public class VaultCurrency implements Currency {
 
     @Override
     public String getName(double amount) {
-        return amount == 1 ? plugin.getConfig().getString("default_currencies.vault.name.singular", "Dollar") : plugin.getConfig().getString("default_currencies.vault.name.plural", "Dollars");
+        return "$" + Text.formatCurrency(amount); //amount == 1 ? plugin.getConfig().getString("default_currencies.vault.name.singular", "Dollar") : plugin.getConfig().getString("default_currencies.vault.name.plural", "Dollars");
     }
 }

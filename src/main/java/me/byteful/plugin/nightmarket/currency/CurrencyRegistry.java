@@ -1,6 +1,7 @@
 package me.byteful.plugin.nightmarket.currency;
 
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
+import me.byteful.plugin.nightmarket.currency.impl.CoinsEngineCurrency;
 import me.byteful.plugin.nightmarket.currency.impl.EcoBitsCurrency;
 import me.byteful.plugin.nightmarket.currency.impl.PlayerPointsCurrency;
 import me.byteful.plugin.nightmarket.currency.impl.VaultCurrency;
@@ -28,7 +29,10 @@ public class CurrencyRegistry {
         register(new PlayerPointsCurrency(plugin));
         // EcoBits has multiple possible currencies within it, so lets register all of them with the format: 'ecobits:<currency>'
         if (!new EcoBitsCurrency.EcoBitsCurrencyHandler(this).registerAll()) {
-            plugin.getLogger().warning("Skipped loading currency adapter: ecobits");
+            plugin.getLogger().info("Skipped loading currency adapter: ecobits");
+        }
+        if (!new CoinsEngineCurrency.CoinsEngineCurrencyHandler(this).registerAll()) {
+            plugin.getLogger().info("Skipped loading currency adapter: coinsengine");
         }
 
         isLoaded = true;
@@ -49,7 +53,7 @@ public class CurrencyRegistry {
             currency.load();
             plugin.getLogger().info("Registered currency adapter: " + currency.getId());
         } else {
-            plugin.getLogger().warning("Skipped loading currency adapter: " + currency.getId());
+            plugin.getLogger().info("Skipped loading currency adapter: " + currency.getId());
         }
 
         currencies.put(currency.getId().toLowerCase(), currency);

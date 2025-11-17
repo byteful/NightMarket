@@ -45,6 +45,17 @@ public interface Currency {
      *
      * @param amount the amount of this currency
      * @return the formatted currency name
+     * @deprecated Override format(double) instead.
      */
+    @Deprecated
     String getName(double amount);
+
+
+    /**
+     * @param amount the amount of this currency
+     * @return the formatted string (ex: '$10' or '10 coins')
+     */
+    default String format(double amount) {
+        return getName(amount);
+    }
 }

@@ -17,6 +17,7 @@ public class ShopItemRegistry {
     }
 
     public void load() {
+        final int[] total = new int[]{0};
         plugin.getConfig().getConfigurationSection("items").getValues(false).forEach((id, data) -> {
             ShopItem parsed;
             try {
@@ -27,8 +28,9 @@ public class ShopItemRegistry {
             }
 
             register(parsed);
-            plugin.getLogger().info("Registered item: " + id);
+            total[0]++;
         });
+        plugin.getLogger().info("Registered " + total[0] + " items...");
     }
 
     public ShopItem get(String id) {
