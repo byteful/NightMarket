@@ -73,9 +73,9 @@ other:
 # > Example item configuration:
 #  ItemId:
 #    icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
-#      name: "diamond sword" # The display name of the icon displayed in the shop.
+#      name: "<!i>diamond sword" # The display name of the icon displayed in the shop.
 #      lore:
-#        - "hello" # The lore of the icon displayed in the shop.
+#        - "<!i>hello" # The lore of the icon displayed in the shop.
 #      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
 #    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item.
 #    price:
@@ -88,12 +88,14 @@ items:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&bA cool Diamond Sword" # The display name of the icon displayed in the shop.
+      name: "<!i><aqua>A cool Diamond Sword" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7Buy me pls :)"
-        - "&6Price: 6.90"
+        - "<!i><gray>Buy me pls :)"
+        - "<!i><gold>Price: 1.00"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -104,17 +106,19 @@ items:
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
-      amount: 6.9 # The actual amount of currency the item costs.
+      amount: 1.00 # The actual amount of currency the item costs.
   ItemId1:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&6Special Dirt" # The display name of the icon displayed in the shop.
+      name: "<!i><gold>Special Dirt" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7i am special"
-        - "&6Price: 6.90"
+        - "<!i><gray>i am special"
+        - "<!i><gold>Price: 1.60"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: DIRT # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -123,17 +127,19 @@ items:
     purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount    rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
-      amount: 6.9 # The actual amount of currency the item costs.
+      amount: 1.60 # The actual amount of currency the item costs.
   ItemId2:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&aApple" # The display name of the icon displayed in the shop.
+      name: "<!i><green>Apple" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7probably an apple"
-        - "&6Price: 6.90"
+        - "<!i><gray>probably an apple"
+        - "<!i><gold>Price: 3.20"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: APPLE # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -143,17 +149,19 @@ items:
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
-      amount: 6.9 # The actual amount of currency the item costs.
+      amount: 3.20 # The actual amount of currency the item costs.
   ItemId3:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&dMystery Item" # The display name of the icon displayed in the shop.
+      name: "<!i><light_purple>Mystery Item" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7this is definitely not a golden apple"
-        - "&6Price: 6.90"
+        - "<!i><gray>this is definitely not a golden apple"
+        - "<!i><gold>Price: 6.40"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: BLUE_DYE # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -163,17 +171,19 @@ items:
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
-      amount: 6.9 # The actual amount of currency the item costs.
+      amount: 6.40 # The actual amount of currency the item costs.
   ItemId4:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&8Bucket o' Milk" # The display name of the icon displayed in the shop.
+      name: "<!i><dark_gray>Bucket o' Milk" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7i am a milk bucket"
-        - "&6Price: 6.90"
+        - "<!i><gray>i am a milk bucket"
+        - "<!i><gold>Price: 1.28"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: MILK_BUCKET # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -183,17 +193,19 @@ items:
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
-      amount: 6.9 # The actual amount of currency the item costs.
+      amount: 1.28 # The actual amount of currency the item costs.
   ItemId5:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&ewooden thing" # The display name of the icon displayed in the shop.
+      name: "<!i><yellow>wooden thing" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7stickkkkkkkkk"
-        - "&6Price: 6.90"
+        - "<!i><gray>stickkkkkkkkk"
+        - "<!i><gold>Price: 2.56"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: STICK # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -203,17 +215,19 @@ items:
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
-      amount: 6.9 # The actual amount of currency the item costs.
+      amount: 2.56 # The actual amount of currency the item costs.
   ItemId6:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&7a secret minecraft item" # The display name of the icon displayed in the shop.
+      name: "<!i><gray>a secret minecraft item" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7u can buy me multiple times unlike the other items!"
-        - "&6Price: 6.90"
+        - "<!i><gray>u can buy me multiple times unlike the other items!"
+        - "<!i><gold>Price: 5.12"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: DIRT # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -223,17 +237,19 @@ items:
     rarity: 100.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
-      amount: 6.9 # The actual amount of currency the item costs.
+      amount: 5.12 # The actual amount of currency the item costs.
   ItemId7:
     icon: # Configuration for the icon displayed in the shop, not the actual item given to the player. That is done via commands for flexibility.
       # This supports PlaceholderAPI and proprietary NightMarket placeholders.
       # Placeholders: {stock} - total stock of item, {purchase_count} - amount of item purchased
-      name: "&7paper" # The display name of the icon displayed in the shop.
+      name: "<!i><gray>paper" # The display name of the icon displayed in the shop.
       lore: # The lore of the icon displayed in the shop.
-        - "&7some premium paper."
-        - "&6Price: 1 million!"
+        - "<!i><gray>some premium paper."
+        - "<!i><gold>Price: 1 million!"
         - ""
-        - "&7Purchased: {purchase_count}/{stock}"
+        - "<!i><gray>Purchased: {purchase_count}/{stock}"
+        - ""
+        - "<!i>{status}"
       custom_model_data: 1 # The custom model data of the icon. Only works on versions 1.14+
       amount: 1 # The number of items in the GUI slot.
       material: PAPER # The material of the icon displayed in the shop. This is not the item given to the player.
@@ -282,7 +298,7 @@ gui:
       - ""
     material: GRAY_STAINED_GLASS_PANE # player_head instead of material also supported here.
   # Title of the GUI
-  title: "&6NightMarket"
+  title: "<dark_gray>NightMarket"
   # Number of rows in the GUI
   rows: 3
   # The frequency (in ticks) that this GUI should be refreshed (useful for live placeholders). Set to -1 to disable refreshing. Set to 20 to refresh every second.
@@ -302,10 +318,10 @@ gui:
   # Any extra icons that you want to display in the GUI.
   extra_icons:
     info:
-      name: "&bInformation"
+      name: "<!i><aqua>Information"
       lore:
-        - "&7This shop is unique for all players."
-        - "&7This shop rotates on a certain interval."
+        - "<!i><gray>This shop is unique for all players."
+        - "<!i><gray>This shop rotates on a certain interval."
       material: PAPER
       slots:
         - "22"

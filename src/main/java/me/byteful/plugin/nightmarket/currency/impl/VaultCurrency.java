@@ -1,13 +1,12 @@
 package me.byteful.plugin.nightmarket.currency.impl;
 
+import java.util.Objects;
+import java.util.UUID;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import me.byteful.plugin.nightmarket.util.Text;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
-
-import java.util.Objects;
-import java.util.UUID;
 
 public class VaultCurrency implements Currency {
     private final NightMarketPlugin plugin;
@@ -24,7 +23,8 @@ public class VaultCurrency implements Currency {
 
     @Override
     public void load() {
-        this.eco = Objects.requireNonNull(Bukkit.getServicesManager().getRegistration(Economy.class), "Failed to find a valid Vault currency adapter.").getProvider();
+        this.eco = Objects.requireNonNull(Bukkit.getServicesManager().getRegistration(Economy.class), "Failed to find a valid Vault currency adapter.")
+            .getProvider();
     }
 
     @Override
@@ -34,16 +34,16 @@ public class VaultCurrency implements Currency {
 
     @Override
     public boolean canPlayerAfford(UUID player, double price) {
-        return eco.has(Bukkit.getOfflinePlayer(player), Math.abs(price));
+        return this.eco.has(Bukkit.getOfflinePlayer(player), Math.abs(price));
     }
 
     @Override
     public void withdraw(UUID player, double amount) {
-        eco.withdrawPlayer(Bukkit.getOfflinePlayer(player), Math.abs(amount));
+        this.eco.withdrawPlayer(Bukkit.getOfflinePlayer(player), Math.abs(amount));
     }
 
     @Override
     public String getName(double amount) {
-        return "$" + Text.formatCurrency(amount); //amount == 1 ? plugin.getConfig().getString("default_currencies.vault.name.singular", "Dollar") : plugin.getConfig().getString("default_currencies.vault.name.plural", "Dollars");
+        return "$" + Text.formatCurrency(amount);
     }
 }

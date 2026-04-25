@@ -81,7 +81,8 @@ public abstract class URLClassLoaderAccess {
 
         @Override
         public void addURL(URL url) {
-            throw new UnsupportedOperationException("NightMarket is unable to inject classes properly into your Java runtime! Please contact byteful on discord about this!");
+            throw new UnsupportedOperationException(
+                "NightMarket is unable to inject classes properly into your Java runtime! Please contact byteful on discord about this!");
         }
     }
 

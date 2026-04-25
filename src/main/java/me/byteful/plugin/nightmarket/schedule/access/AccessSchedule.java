@@ -1,54 +1,53 @@
 package me.byteful.plugin.nightmarket.schedule.access;
 
-import me.byteful.plugin.nightmarket.NightMarketPlugin;
-import me.byteful.plugin.nightmarket.schedule.ScheduleType;
-
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.Map;
+import me.byteful.plugin.nightmarket.schedule.ScheduleType;
 
 public class AccessSchedule {
     private final ScheduleType type;
     private final String startRaw, endRaw;
+    private final ZoneId timezone;
 
-    public AccessSchedule(ScheduleType type, Map<?, ?> data) {
+    public AccessSchedule(ScheduleType type, Map<?, ?> data, ZoneId timezone) {
         this.type = type;
         this.startRaw = (String) data.get("start");
         this.endRaw = (String) data.get("end");
+        this.timezone = timezone;
     }
 
     public boolean isNowBetween() {
-        final LocalDateTime now = LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone());
+        final LocalDateTime now = LocalDateTime.now(this.timezone);
 
-        if (type == ScheduleType.DATE) {
-            return now.isAfter(getStart(now)) && now.isBefore(getEnd(now));
+        if (this.type == ScheduleType.DATE) {
+            return now.isAfter(this.getStart(now)) && now.isBefore(this.getEnd(now));
         } else {
-            // Check current day's schedule window
-            final LocalDateTime start = getStart(now);
-            final LocalDateTime end = getEnd(now);
+            final LocalDateTime start = this.getStart(now);
+            final LocalDateTime end = this.getEnd(now);
             if (now.isAfter(start) && now.isBefore(end)) {
                 return true;
             }
 
-            // Check previous day's schedule window (for overnight schedules)
-            final LocalDateTime prevStart = getStart(now.minusDays(1));
-            final LocalDateTime prevEnd = getEnd(now.minusDays(1));
+            final LocalDateTime prevStart = this.getStart(now.minusDays(1));
+            final LocalDateTime prevEnd = this.getEnd(now.minusDays(1));
             return now.isAfter(prevStart) && now.isBefore(prevEnd);
         }
     }
 
     public LocalDateTime getStart(LocalDateTime from) {
-        if (type == ScheduleType.TIMES) {
-            return type.parseTime(startRaw).atDate(from.toLocalDate());
+        if (this.type == ScheduleType.TIMES) {
+            return this.type.parseTime(this.startRaw).atDate(from.toLocalDate());
         } else {
-            return type.parse(startRaw);
+            return this.type.parse(this.startRaw);
         }
     }
 
     public LocalDateTime getEnd(LocalDateTime from) {
-        if (type == ScheduleType.TIMES) {
-            final LocalTime startTime = type.parseTime(startRaw);
-            final LocalTime endTime = type.parseTime(endRaw);
+        if (this.type == ScheduleType.TIMES) {
+            final LocalTime startTime = this.type.parseTime(this.startRaw);
+            final LocalTime endTime = this.type.parseTime(this.endRaw);
             LocalDateTime end = endTime.atDate(from.toLocalDate());
             if (endTime.isBefore(startTime)) {
                 end = end.plusDays(1);
@@ -56,11 +55,11 @@ public class AccessSchedule {
 
             return end;
         } else {
-            return type.parse(endRaw);
+            return this.type.parse(this.endRaw);
         }
     }
 
     public LocalDateTime getStart() {
-        return getStart(LocalDateTime.now(NightMarketPlugin.getInstance().getTimezone()));
+        return this.getStart(LocalDateTime.now(this.timezone));
     }
 }

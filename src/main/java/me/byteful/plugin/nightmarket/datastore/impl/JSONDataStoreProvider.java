@@ -2,15 +2,18 @@ package me.byteful.plugin.nightmarket.datastore.impl;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import me.byteful.plugin.nightmarket.NightMarketPlugin;
-import me.byteful.plugin.nightmarket.datastore.DataStoreProvider;
-import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import me.byteful.plugin.nightmarket.NightMarketPlugin;
+import me.byteful.plugin.nightmarket.datastore.DataStoreProvider;
+import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
 
 public class JSONDataStoreProvider implements DataStoreProvider {
     private final JsonObject data;
@@ -40,13 +43,13 @@ public class JSONDataStoreProvider implements DataStoreProvider {
 
     @Override
     public void setPlayerShop(PlayerShop shop) {
-        data.get("shops").getAsJsonObject().add(shop.getUniqueId().toString(), DataStoreProvider.GSON.toJsonTree(shop));
-        save();
+        this.data.get("shops").getAsJsonObject().add(shop.getUniqueId().toString(), DataStoreProvider.GSON.toJsonTree(shop));
+        this.save();
     }
 
     @Override
     public Optional<PlayerShop> getPlayerShop(UUID player) {
-        final JsonElement shop = data.get("shops").getAsJsonObject().get(player.toString());
+        final JsonElement shop = this.data.get("shops").getAsJsonObject().get(player.toString());
         if (shop == null) {
             return Optional.empty();
         }
@@ -58,7 +61,7 @@ public class JSONDataStoreProvider implements DataStoreProvider {
     public Set<PlayerShop> getAllShops() {
         final Set<PlayerShop> set = new HashSet<>();
 
-        for (Map.Entry<String, JsonElement> entry : data.get("shops").getAsJsonObject().entrySet()) {
+        for (Map.Entry<String, JsonElement> entry : this.data.get("shops").getAsJsonObject().entrySet()) {
             set.add(DataStoreProvider.GSON.fromJson(entry.getValue(), PlayerShop.class));
         }
 
@@ -67,12 +70,12 @@ public class JSONDataStoreProvider implements DataStoreProvider {
 
     @Override
     public boolean test() {
-        return file != null && data != null && data.has("shops");
+        return this.file != null && this.data != null && this.data.has("shops");
     }
 
     private void save() {
         try {
-            Files.write(file.toPath(), DataStoreProvider.GSON.toJson(data).getBytes(StandardCharsets.UTF_8));
+            Files.write(this.file.toPath(), DataStoreProvider.GSON.toJson(this.data).getBytes(StandardCharsets.UTF_8));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -80,6 +83,6 @@ public class JSONDataStoreProvider implements DataStoreProvider {
 
     @Override
     public void close() {
-        save();
+        this.save();
     }
 }

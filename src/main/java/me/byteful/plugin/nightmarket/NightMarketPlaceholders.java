@@ -1,14 +1,13 @@
 package me.byteful.plugin.nightmarket;
 
-import me.byteful.plugin.nightmarket.shop.item.ShopItem;
-import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
-import me.clip.placeholderapi.expansion.PlaceholderExpansion;
-import org.bukkit.entity.Player;
-
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
+import me.byteful.plugin.nightmarket.shop.item.ShopItem;
+import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
+import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+import org.bukkit.entity.Player;
 
 public class NightMarketPlaceholders extends PlaceholderExpansion {
     private final NightMarketPlugin plugin;
@@ -33,12 +32,12 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
     }
 
     @Override
-    public boolean canRegister() {
+    public boolean persist() {
         return true;
     }
 
     @Override
-    public boolean persist() {
+    public boolean canRegister() {
         return true;
     }
 
@@ -48,7 +47,7 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
             return null;
         }
 
-        final PlayerShop shop = plugin.getPlayerShopManager().get(player.getUniqueId());
+        final PlayerShop shop = this.plugin.getPlayerShopManager().get(player.getUniqueId());
         if (shop == null) {
             return null;
         }
@@ -57,21 +56,21 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
 
         if (params.startsWith("stock_")) {
             final String itemId = params.substring(6);
-            final ShopItem item = plugin.getShopItemRegistry().get(itemId);
+            final ShopItem item = this.plugin.getShopItemRegistry().get(itemId);
 
             if (item == null) {
                 return null;
             }
 
-            final int limit = item.getPurchaseLimit();
+            final int limit = item.purchaseLimit();
             if (limit == Integer.MAX_VALUE) {
-                return plugin.getMessage(null, "infinite_stock");
+                return this.plugin.getMessageManager().get("infinite_stock");
             }
 
-            final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
+            final boolean globalCheck = this.plugin.getConfig().getBoolean("other.global_purchase_limits");
             final int purchased = globalCheck
-                    ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item)
-                    : shop.getPurchasedShopItems().getOrDefault(itemId, 0);
+                                  ? this.plugin.getPlayerShopManager().getGlobalPurchaseCount(item)
+                                  : shop.getPurchasedShopItems().getOrDefault(itemId, 0);
 
             final int remaining = Math.max(0, limit - purchased);
             return String.valueOf(remaining);
@@ -87,23 +86,23 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
             }
 
             case "rotate": {
-                return plugin.getRotateScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
+                return this.plugin.getRotateScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
             }
 
             case "open": {
-                return plugin.getAccessScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
+                return this.plugin.getAccessScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
             }
 
             case "rotate_countdown": {
-                return getCountdown(plugin.getRotateScheduleManager().getNextTime());
+                return this.getCountdown(this.plugin.getRotateScheduleManager().getNextTime());
             }
 
             case "open_countdown": {
-                return getCountdown(plugin.getAccessScheduleManager().getNextTime());
+                return this.getCountdown(this.plugin.getAccessScheduleManager().getNextTime());
             }
 
             case "timezone": {
-                return plugin.getTimezone().toString();
+                return this.plugin.getTimezone().toString();
             }
 
             default: {
@@ -113,16 +112,24 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
     }
 
     private String getCountdown(LocalDateTime end) {
-        final Duration between = Duration.between(LocalDateTime.now(plugin.getTimezone()), end);
-        return convertDurationToString(between);
+        final Duration between = Duration.between(LocalDateTime.now(this.plugin.getTimezone()), end);
+        return this.convertDurationToString(between);
     }
 
     private String convertDurationToString(Duration duration) {
         final long seconds = duration.getSeconds();
-        final long HH = seconds / 3600;
-        final long MM = (seconds % 3600) / 60;
-        final long SS = seconds % 60;
+        final long h = seconds / 3600;
+        final long m = (seconds % 3600) / 60;
+        final long s = seconds % 60;
 
-        return String.format("%02d:%02d:%02d", HH, MM, SS);
+        StringBuilder sb = new StringBuilder();
+        if (h > 0) {
+            sb.append(h).append("h, ");
+        }
+        if (h > 0 || m > 0) {
+            sb.append(m).append("m, ");
+        }
+        sb.append(s).append("s");
+        return sb.toString();
     }
 }

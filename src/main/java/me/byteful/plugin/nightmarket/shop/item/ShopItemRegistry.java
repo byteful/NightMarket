@@ -1,12 +1,11 @@
 package me.byteful.plugin.nightmarket.shop.item;
 
-import me.byteful.plugin.nightmarket.NightMarketPlugin;
-import me.byteful.plugin.nightmarket.parser.ShopItemParser;
-import org.bukkit.configuration.ConfigurationSection;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import me.byteful.plugin.nightmarket.NightMarketPlugin;
+import me.byteful.plugin.nightmarket.parser.ShopItemParser;
+import org.bukkit.configuration.ConfigurationSection;
 
 public class ShopItemRegistry {
     private final Map<String, ShopItem> items = new HashMap<>();
@@ -18,34 +17,34 @@ public class ShopItemRegistry {
 
     public void load() {
         final int[] total = new int[]{0};
-        plugin.getConfig().getConfigurationSection("items").getValues(false).forEach((id, data) -> {
+        this.plugin.getConfig().getConfigurationSection("items").getValues(false).forEach((id, data) -> {
             ShopItem parsed;
             try {
-                parsed = ShopItemParser.parse(plugin.getLogger(), plugin.getCurrencyRegistry(), (ConfigurationSection) data);
+                parsed = ShopItemParser.parse(this.plugin.getLogger(), this.plugin.getCurrencyRegistry(), (ConfigurationSection) data);
             } catch (Exception e) {
-                plugin.getLogger().warning("Skipped loading ShopItem: " + id + " (" + e.getMessage() + ")");
+                this.plugin.getLogger().warning("Skipped loading ShopItem: " + id + " (" + e.getMessage() + ")");
                 return;
             }
 
-            register(parsed);
+            this.register(parsed);
             total[0]++;
         });
-        plugin.getLogger().info("Registered " + total[0] + " items...");
-    }
-
-    public ShopItem get(String id) {
-        return items.get(id);
-    }
-
-    public Collection<ShopItem> getAll() {
-        return items.values();
+        this.plugin.getLogger().info("Registered " + total[0] + " items...");
     }
 
     public void register(ShopItem item) {
-        items.put(item.getId(), item);
+        this.items.put(item.id(), item);
+    }
+
+    public ShopItem get(String id) {
+        return this.items.get(id);
+    }
+
+    public Collection<ShopItem> getAll() {
+        return this.items.values();
     }
 
     public int getMaxItems() {
-        return plugin.getParsedGUI().getItemSlots().size();
+        return this.plugin.getParsedGUI().getItemSlots().size();
     }
 }

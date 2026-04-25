@@ -1,7 +1,5 @@
 package me.byteful.plugin.nightmarket.schedule;
 
-import me.byteful.plugin.nightmarket.NightMarketPlugin;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -10,12 +8,11 @@ import java.util.Locale;
 
 public enum ScheduleType {
     DATE {
-        private final DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US).withZone(NightMarketPlugin.getInstance().getTimezone());
+        private final DateTimeFormatter format = DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US);
 
         @Override
         public LocalDateTime parse(String str) {
-            return LocalDateTime.parse(str, format);
-            //return format.parse(str, Instant::from);
+            return LocalDateTime.parse(str, this.format);
         }
 
         @Override
@@ -24,17 +21,16 @@ public enum ScheduleType {
         }
     },
     TIMES {
-        private final DateTimeFormatter format = DateTimeFormatter.ofPattern("hh:mm:ss a", Locale.US).withZone(NightMarketPlugin.getInstance().getTimezone());
+        private final DateTimeFormatter format = DateTimeFormatter.ofPattern("hh:mm:ss a", Locale.US);
 
         @Override
         public LocalDateTime parse(String str) {
-            return LocalTime.parse(str, format).atDate(LocalDate.now());
-            //return format.parse(str, Instant::from);
+            return LocalTime.parse(str, this.format).atDate(LocalDate.now());
         }
 
         @Override
         public LocalTime parseTime(String str) {
-            return LocalTime.parse(str, format);
+            return LocalTime.parse(str, this.format);
         }
     };
 

@@ -40,6 +40,14 @@ public interface Currency {
     void withdraw(UUID player, double amount);
 
     /**
+     * @param amount the amount of this currency
+     * @return the formatted string (ex: '$10' or '10 coins')
+     */
+    default String format(double amount) {
+        return this.getName(amount);
+    }
+
+    /**
      * Returns a singular/plural name depending on the currency amount.
      * Ex: [amount] dollar(s)
      *
@@ -49,13 +57,4 @@ public interface Currency {
      */
     @Deprecated
     String getName(double amount);
-
-
-    /**
-     * @param amount the amount of this currency
-     * @return the formatted string (ex: '$10' or '10 coins')
-     */
-    default String format(double amount) {
-        return getName(amount);
-    }
 }

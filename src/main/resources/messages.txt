@@ -1,12 +1,15 @@
-cannot_afford: &cYou cannot afford this item! You need at least {amount} to purchase this item.
-already_purchased: &cThis item cannot be purchased again!
-successfully_purchased_item: &aSuccessfully purchased {item}.
-shop_not_open: &cThe shop is not currently open! It will open at: %nightmarket_open%
-rotate_announcement: &6The NightMarket has rotated!
-reload_success: &aSuccessfully reloaded NightMarket's configuration.
-force_rotated: &aForcefully rotated {player}'s shop.
-shop_loading: &cSorry, but the shop is still loading! Please wait and try again later.
-no_permission: &cYou do not have permission to execute this command!
-item_max_global_purchases: &cThis item is out of stock!
-force_rotated_all: &aForcefully rotated all shops!
-infinite_stock: &f∞
+cannot_afford: <red>You cannot afford this item! You need at least {amount} to purchase this item.
+already_purchased: <red>This item cannot be purchased again!
+successfully_purchased_item: <green>Successfully purchased {item}.
+shop_not_open: <red>The shop is not currently open! It will open at: %nightmarket_open%
+rotate_announcement: <gold>The NightMarket has rotated!
+reload_success: <green>Successfully reloaded NightMarket's configuration.
+force_rotated: <green>Forcefully rotated {player}'s shop.
+shop_loading: <red>Sorry, but the shop is still loading! Please wait and try again later.
+no_permission: <red>You do not have permission to execute this command!
+item_max_global_purchases: <red>This item is out of stock!
+force_rotated_all: <green>Forcefully rotated all shops!
+infinite_stock: <gray>∞
+status_available: <green><bold>Click to purchase!</bold>
+status_bought_out: <red><bold>Sold out!</bold>
+status_inventory_full: <red><bold>Inventory full!</bold>

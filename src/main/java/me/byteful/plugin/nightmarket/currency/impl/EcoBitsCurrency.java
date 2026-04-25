@@ -2,13 +2,12 @@ package me.byteful.plugin.nightmarket.currency.impl;
 
 import com.willfp.ecobits.currencies.Currencies;
 import com.willfp.ecobits.currencies.CurrencyUtils;
+import java.math.BigDecimal;
+import java.util.UUID;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import me.byteful.plugin.nightmarket.currency.CurrencyRegistry;
 import me.byteful.plugin.nightmarket.util.Text;
 import org.bukkit.Bukkit;
-
-import java.math.BigDecimal;
-import java.util.UUID;
 
 public class EcoBitsCurrency implements Currency {
     private final com.willfp.ecobits.currencies.Currency adapter;
@@ -19,7 +18,7 @@ public class EcoBitsCurrency implements Currency {
 
     @Override
     public String getId() {
-        return "ecobits:" + adapter.getId();
+        return "ecobits:" + this.adapter.getId();
     }
 
     @Override
@@ -29,22 +28,22 @@ public class EcoBitsCurrency implements Currency {
 
     @Override
     public boolean canLoad() {
-        return adapter != null && Bukkit.getPluginManager().isPluginEnabled("EcoBits");
+        return this.adapter != null && Bukkit.getPluginManager().isPluginEnabled("EcoBits");
     }
 
     @Override
     public boolean canPlayerAfford(UUID player, double price) {
-        return CurrencyUtils.getBalance(Bukkit.getOfflinePlayer(player), adapter).doubleValue() >= price;
+        return CurrencyUtils.getBalance(Bukkit.getOfflinePlayer(player), this.adapter).doubleValue() >= price;
     }
 
     @Override
     public void withdraw(UUID player, double amount) {
-        CurrencyUtils.adjustBalance(Bukkit.getOfflinePlayer(player), adapter, BigDecimal.valueOf(-amount));
+        CurrencyUtils.adjustBalance(Bukkit.getOfflinePlayer(player), this.adapter, BigDecimal.valueOf(-amount));
     }
 
     @Override
     public String getName(double amount) {
-        return Text.formatCurrency(amount) + " " + adapter.getName();
+        return Text.formatCurrency(amount) + " " + this.adapter.getName();
     }
 
     public static class EcoBitsCurrencyHandler {
@@ -55,12 +54,14 @@ public class EcoBitsCurrency implements Currency {
         }
 
         public boolean registerAll() {
-            if (!Bukkit.getPluginManager().isPluginEnabled("EcoBits")) return false;
+            if (!Bukkit.getPluginManager().isPluginEnabled("EcoBits")) {
+                return false;
+            }
 
-            registry.getCurrencies().keySet().removeIf(id -> id.startsWith("ecobits:"));
+            this.registry.getCurrencies().keySet().removeIf(id -> id.startsWith("ecobits:"));
             boolean anyRegistered = false;
             for (com.willfp.ecobits.currencies.Currency adapter : Currencies.values()) {
-                registry.register(new EcoBitsCurrency(adapter));
+                this.registry.register(new EcoBitsCurrency(adapter));
                 anyRegistered = true;
             }
 

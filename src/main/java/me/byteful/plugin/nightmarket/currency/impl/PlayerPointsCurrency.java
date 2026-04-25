@@ -1,13 +1,12 @@
 package me.byteful.plugin.nightmarket.currency.impl;
 
+import java.util.UUID;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import me.byteful.plugin.nightmarket.util.Text;
 import org.black_ixx.playerpoints.PlayerPoints;
 import org.black_ixx.playerpoints.PlayerPointsAPI;
 import org.bukkit.Bukkit;
-
-import java.util.UUID;
 
 public class PlayerPointsCurrency implements Currency {
     private final NightMarketPlugin plugin;
@@ -34,16 +33,20 @@ public class PlayerPointsCurrency implements Currency {
 
     @Override
     public boolean canPlayerAfford(UUID player, double price) {
-        return eco.look(player) >= price;
+        return this.eco.look(player) >= price;
     }
 
     @Override
     public void withdraw(UUID player, double amount) {
-        eco.take(player, (int) amount);
+        this.eco.take(player, (int) amount);
     }
 
     @Override
     public String getName(double amount) {
-        return Text.formatCurrency(amount) + " " + (amount == 1 ? plugin.getConfig().getString("default_currencies.playerpoints.name.singular", "Token") : plugin.getConfig().getString("default_currencies.playerpoints.name.plural", "Tokens"));
+        return Text.formatCurrency(amount) + " " + (amount == 1 ? this.plugin.getConfig()
+                                                                  .getString("default_currencies.playerpoints.name.singular", "Token") : this.plugin.getConfig()
+                                                                                                                                         .getString(
+                                                                                                                                             "default_currencies.playerpoints.name.plural",
+                                                                                                                                             "Tokens"));
     }
 }

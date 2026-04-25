@@ -2,16 +2,17 @@ package me.byteful.plugin.nightmarket.datastore.impl;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.sql.Connection;
+import java.sql.SQLException;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.datastore.SQLConnectionProvider;
 import me.byteful.plugin.nightmarket.datastore.SQLDataStoreProvider;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 public class MySQLDataStoreProvider extends SQLDataStoreProvider {
     public MySQLDataStoreProvider(NightMarketPlugin plugin) {
-        super(buildConnectionProvider(plugin.getConfig().getString("datastore.mysql.host"), plugin.getConfig().getInt("datastore.mysql.port"), plugin.getConfig().getString("datastore.mysql.user"), plugin.getConfig().getString("datastore.mysql.password"), plugin.getConfig().getString("datastore.mysql.database")), "ON DUPLICATE KEY UPDATE");
+        super(buildConnectionProvider(plugin.getConfig().getString("datastore.mysql.host"), plugin.getConfig().getInt("datastore.mysql.port"),
+            plugin.getConfig().getString("datastore.mysql.user"), plugin.getConfig().getString("datastore.mysql.password"),
+            plugin.getConfig().getString("datastore.mysql.database")), "ON DUPLICATE KEY UPDATE", plugin.getLogger());
     }
 
     private static MySQLConnectionProvider buildConnectionProvider(String host, int port, String user, String pass, String database) {
@@ -46,18 +47,18 @@ public class MySQLDataStoreProvider extends SQLDataStoreProvider {
 
         @Override
         public boolean isValid() {
-            return hikari.isRunning();
+            return this.hikari.isRunning();
         }
 
         @Override
         public void close() {
-            hikari.close();
+            this.hikari.close();
         }
 
         @Override
         public Connection get() {
             try {
-                return hikari.getConnection();
+                return this.hikari.getConnection();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
