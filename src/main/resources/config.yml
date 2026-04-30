@@ -52,6 +52,11 @@ default_currencies:
       singular: "Token"
       plural: "Tokens"
 
+# Shared formatting for NightMarket's built-in schedule replacements.
+formats:
+  date_time: "MM/dd/yyyy hh:mm:ss a"
+  countdown: "{hours}h, {minutes}m, {seconds}s"
+
 # Configuration for other miscellaneous settings.
 other:
   # Should the GUI close after buying an item?
@@ -65,6 +70,8 @@ other:
   # Should item purchase limits be global or per-player? (true = global, false = per-player)
   # Note: YOU MUST restart the server after changing this option!
   global_purchase_limits: false
+  # Should previous rotation items be excluded from the next roll when enough eligible items exist?
+  prevent_repeat_items: false
   # Should debug messages be sent to console?
   debug: false
 
@@ -78,6 +85,8 @@ other:
 #        - "<!i>hello" # The lore of the icon displayed in the shop.
 #      material: DIAMOND_SWORD # The material of the icon displayed in the shop. This is not the item given to the player.
 #    command: "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item.
+#    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+#    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
 #    price:
 #      currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
 #      amount: 6.9 # The actual amount of currency the item costs.
@@ -103,6 +112,8 @@ items:
     command: # Can be a list or a single string.
       - "/give {player} diamond_sword 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
     purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -124,7 +135,10 @@ items:
       material: DIRT # The material of the icon displayed in the shop. This is not the item given to the player.
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} dirt 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
-    purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount    rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
+    purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
+    rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
       amount: 1.60 # The actual amount of currency the item costs.
@@ -146,6 +160,8 @@ items:
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} apple 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
     purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -168,6 +184,8 @@ items:
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} golden_apple 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
     purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -190,6 +208,8 @@ items:
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} milk_bucket 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
     purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -212,6 +232,8 @@ items:
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} stick 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
     purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -234,6 +256,8 @@ items:
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} diamond 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
     purchase_limit: 0 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
     rarity: 100.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -256,6 +280,8 @@ items:
       # player_head: "Steve" # The player name or skull texture to put on a player head. This is not the item given to the player.
     command: "/give {player} paper 1" # The command ran once the player successfully buys the item. Placeholders: {player} - the player's name
     purchase_limit: 1 # 0 = infinite purchases, otherwise, players are limited to only purchasing the limited amount
+    permission: "" # Permission required to buy this item. Leave blank for no permission requirement.
+    confirm_purchase: "DEFAULT" # Modes: DEFAULT, ENABLED, DISABLED. DEFAULT uses purchase_confirmation.enabled.
     rarity: 1.0 # Higher the rarity value, the more common. This will act as a weight when randomly selecting items for shop rotations.
     price:
       currency: "VAULT" # Currency depends on hooked currency plugins. Vault is supported by default. Other plugins will require external hooks to work with this option.
@@ -297,13 +323,18 @@ gui:
     lore:
       - ""
     material: GRAY_STAINED_GLASS_PANE # player_head instead of material also supported here.
+  unavailable_icon:
+    name: "<!i><red>Unavailable"
+    lore:
+      - "<!i><gray>No eligible item is available for this slot."
+    material: BARRIER
   # Title of the GUI
   title: "<dark_gray>NightMarket"
   # Number of rows in the GUI
   rows: 3
   # The frequency (in ticks) that this GUI should be refreshed (useful for live placeholders). Set to -1 to disable refreshing. Set to 20 to refresh every second.
   # Recommended to do 20 ticks so it puts less load on your server.
-  update: -1
+  update: 20
   # The GUI slots that will be populated with the background_icon item.
   # You may use '-' to indicate to. EX: 1-24 means all slots from 1 to 24.
   background_slots:
@@ -322,9 +353,51 @@ gui:
       lore:
         - "<!i><gray>This shop is unique for all players."
         - "<!i><gray>This shop rotates on a certain interval."
-      material: PAPER
+        - ""
+        - "<!i><gray>Next rotation: <white>{rotate_countdown}"
+      material: CLOCK
       slots:
-        - "22"
+        - "4"
+
+# Settings for /nightmarketadmin view <player-or-uuid>
+admin_view:
+  title: "<dark_gray>{player}'s NightMarket"
+
+# Settings for the confirmation GUI displayed before purchases.
+purchase_confirmation:
+  enabled: true
+  title: "Confirm Purchase"
+  rows: 3
+  background_icon:
+    name: " "
+    lore:
+      - ""
+    material: BLACK_STAINED_GLASS_PANE
+  background_slots:
+    - "0-26"
+  preview_slot: 13
+  confirm_icon:
+    name: "<!i><green><bold>CONFIRM"
+    lore:
+      - "<!i><gray>Price: <white>{price}"
+      - ""
+      - "<!i><green>Click to buy this item."
+    material: GREEN_STAINED_GLASS_PANE
+  # These support slot ranges like "0-2" and "18-20".
+  confirm_slots:
+    - "0-2"
+    - "9-11"
+    - "18-20"
+  deny_icon:
+    name: "<!i><red><bold>CANCEL"
+    lore:
+      - "<!i><gray>Return to your NightMarket."
+    material: RED_STAINED_GLASS_PANE
+  # These support slot ranges like "6-8" and "24-26".
+  deny_slots:
+    - "6-8"
+    - "15-17"
+    - "24-26"
 
 # Timezones supported by Java.
 #

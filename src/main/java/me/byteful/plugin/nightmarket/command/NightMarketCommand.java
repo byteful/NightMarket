@@ -28,7 +28,7 @@ public class NightMarketCommand {
             return;
         }
 
-        final PlayerShop shop = this.plugin.getPlayerShopManager().get(sender.getUniqueId());
+        final PlayerShop shop = this.plugin.getPlayerShopManager().get(sender);
         this.plugin.getParsedGUI().build(shop, this.plugin).open(sender);
     }
 }

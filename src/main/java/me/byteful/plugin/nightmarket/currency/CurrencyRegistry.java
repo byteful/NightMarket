@@ -40,7 +40,7 @@ public class CurrencyRegistry {
         this.plugin.getShopItemRegistry().load(); // Have to load items after currencies are loaded.
         this.plugin.getRotateScheduleManager().load();
 
-        Bukkit.getOnlinePlayers().forEach(p -> this.plugin.getPlayerShopManager().load(p.getUniqueId()));
+        Bukkit.getOnlinePlayers().forEach(p -> this.plugin.getPlayerShopManager().load(p));
     }
 
     public void register(Currency currency) {

@@ -3,6 +3,7 @@ package me.byteful.plugin.nightmarket.scheduler.impl;
 import me.byteful.plugin.nightmarket.scheduler.ScheduledTask;
 import me.byteful.plugin.nightmarket.scheduler.Scheduler;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 public class BukkitSchedulerImpl implements Scheduler {
@@ -19,6 +20,11 @@ public class BukkitSchedulerImpl implements Scheduler {
 
     @Override
     public void runGlobal(Runnable runnable) {
+        Bukkit.getScheduler().runTask(this.plugin, runnable);
+    }
+
+    @Override
+    public void runForPlayer(Player player, Runnable runnable) {
         Bukkit.getScheduler().runTask(this.plugin, runnable);
     }
 

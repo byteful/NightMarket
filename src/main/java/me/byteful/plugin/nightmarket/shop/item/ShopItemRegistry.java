@@ -1,11 +1,14 @@
 package me.byteful.plugin.nightmarket.shop.item;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.parser.ShopItemParser;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 
 public class ShopItemRegistry {
     private final Map<String, ShopItem> items = new HashMap<>();
@@ -42,6 +45,22 @@ public class ShopItemRegistry {
 
     public Collection<ShopItem> getAll() {
         return this.items.values();
+    }
+
+    public List<ShopItem> getEligible(Player player) {
+        return this.items.values().stream()
+            .filter(item -> this.isEligible(player, item))
+            .collect(Collectors.toList());
+    }
+
+    public List<ShopItem> getUngated() {
+        return this.items.values().stream()
+            .filter(item -> !item.hasPermissionRequirement())
+            .collect(Collectors.toList());
+    }
+
+    public boolean isEligible(Player player, ShopItem item) {
+        return !item.hasPermissionRequirement() || player != null && player.hasPermission(item.permission());
     }
 
     public int getMaxItems() {

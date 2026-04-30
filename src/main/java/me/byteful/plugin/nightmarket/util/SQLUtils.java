@@ -26,6 +26,10 @@ public class SQLUtils {
     }
 
     public static List<String> deserializeList(String data) {
+        if (data == null || data.isEmpty()) {
+            return new ArrayList<>();
+        }
+
         return new ArrayList<>(Arrays.asList(data.split(",")));
     }
 }

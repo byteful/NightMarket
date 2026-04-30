@@ -14,6 +14,7 @@ import me.byteful.plugin.nightmarket.datastore.impl.MongoDataStoreProvider;
 import me.byteful.plugin.nightmarket.datastore.impl.MySQLDataStoreProvider;
 import me.byteful.plugin.nightmarket.datastore.impl.SQLiteDataStoreProvider;
 import me.byteful.plugin.nightmarket.parser.GUIParser;
+import me.byteful.plugin.nightmarket.parser.PurchaseConfirmationGUI;
 import me.byteful.plugin.nightmarket.schedule.access.AccessScheduleManager;
 import me.byteful.plugin.nightmarket.schedule.rotate.RotateScheduleManager;
 import me.byteful.plugin.nightmarket.scheduler.impl.BukkitSchedulerImpl;
@@ -22,8 +23,10 @@ import me.byteful.plugin.nightmarket.scheduler.ScheduledTask;
 import me.byteful.plugin.nightmarket.scheduler.Scheduler;
 import me.byteful.plugin.nightmarket.shop.item.ShopItemRegistry;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShopManager;
+import me.byteful.plugin.nightmarket.shop.player.PurchaseService;
 import me.byteful.plugin.nightmarket.util.ConfigUpdater;
 import me.byteful.plugin.nightmarket.util.MessageManager;
+import me.byteful.plugin.nightmarket.util.ScheduleReplacementService;
 import me.byteful.plugin.nightmarket.util.Text;
 import me.byteful.plugin.nightmarket.util.UpdateChecker;
 import me.byteful.plugin.nightmarket.util.dependency.IsolatedClassLoader;
@@ -49,6 +52,9 @@ public final class NightMarketPlugin extends JavaPlugin {
     private AccessScheduleManager accessScheduleManager;
     private ShopItemRegistry shopItemRegistry;
     private GUIParser.ParsedGUI parsedGUI;
+    private PurchaseConfirmationGUI purchaseConfirmationGUI;
+    private PurchaseService purchaseService;
+    private ScheduleReplacementService scheduleReplacementService;
     private MessageManager messageManager;
     private ScheduledTask updateCheckingTask;
     private ScheduledTask globalPurchaseTask;
@@ -99,6 +105,8 @@ public final class NightMarketPlugin extends JavaPlugin {
         this.getLogger().info("Loaded currencies...");
 
         this.playerShopManager = new PlayerShopManager(this);
+        this.purchaseService = new PurchaseService(this);
+        this.scheduleReplacementService = new ScheduleReplacementService(this);
         this.getLogger().info("Loaded player shops...");
 
         this.reloadRotateSchedules();
@@ -208,6 +216,7 @@ public final class NightMarketPlugin extends JavaPlugin {
 
     public void reloadParsedGUI() {
         this.parsedGUI = GUIParser.parse(Objects.requireNonNull(this.getConfig().getConfigurationSection("gui")));
+        this.purchaseConfirmationGUI = PurchaseConfirmationGUI.parse(Objects.requireNonNull(this.getConfig().getConfigurationSection("purchase_confirmation")));
     }
 
     public void reloadRotateSchedules() {
@@ -284,6 +293,18 @@ public final class NightMarketPlugin extends JavaPlugin {
 
     public GUIParser.ParsedGUI getParsedGUI() {
         return this.parsedGUI;
+    }
+
+    public PurchaseConfirmationGUI getPurchaseConfirmationGUI() {
+        return this.purchaseConfirmationGUI;
+    }
+
+    public PurchaseService getPurchaseService() {
+        return this.purchaseService;
+    }
+
+    public ScheduleReplacementService getScheduleReplacementService() {
+        return this.scheduleReplacementService;
     }
 
     public void sendMessage(CommandSender sender, Player papiContext, String key, String... replacements) {

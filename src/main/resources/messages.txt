@@ -9,7 +9,20 @@ shop_loading: <red>Sorry, but the shop is still loading! Please wait and try aga
 no_permission: <red>You do not have permission to execute this command!
 item_max_global_purchases: <red>This item is out of stock!
 force_rotated_all: <green>Forcefully rotated all shops!
+item_not_available: <red>This item is no longer available in your NightMarket!
 infinite_stock: <gray>∞
-status_available: <green><bold>Click to purchase!</bold>
-status_bought_out: <red><bold>Sold out!</bold>
-status_inventory_full: <red><bold>Inventory full!</bold>
+status_available: <green><bold>CLICK TO PURCHASE!</bold>
+status_bought_out: <red><bold>SOLD OUT!</bold>
+status_inventory_full: <red><bold>INVENTORY FULL!</bold>
+status_no_permission: <red><bold>NO PERMISSION!</bold>
+status_item_preview: <light_purple><bold>NOT A PREVIEW</bold>
+inventory_full: <red>Your inventory is full!
+no_item_permission: <red>You do not have permission to purchase this item!
+purchase_in_progress: <yellow>Please wait! Your purchase is processing...
+purchase_failed: <red>Purchase failed! Please try again later...
+player_only: <red>Only players can use this command!
+admin_view_loading: <yellow>Loading {player}'s NightMarket...
+admin_view_no_shop: <red>No stored NightMarket shop was found for {player}!
+admin_view_read_only: <yellow>You are viewing this NightMarket in read-only mode.
+schedule_time_unavailable: Unavailable
+schedule_countdown_unavailable: Unavailable

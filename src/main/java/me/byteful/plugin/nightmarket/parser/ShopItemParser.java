@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import me.byteful.plugin.nightmarket.currency.CurrencyRegistry;
+import me.byteful.plugin.nightmarket.shop.item.ConfirmPurchaseMode;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import org.bukkit.configuration.ConfigurationSection;
 
@@ -22,6 +23,15 @@ public class ShopItemParser {
         final double amount = config.getDouble("price.amount");
         final double rarity = config.getDouble("rarity");
         final Currency currency = registry.get(config.getString("price.currency"));
+        final String permission = config.getString("permission", "");
+        ConfirmPurchaseMode confirmPurchaseMode;
+        try {
+            confirmPurchaseMode = ConfirmPurchaseMode.fromConfig(config.getString("confirm_purchase", "DEFAULT"));
+        } catch (IllegalArgumentException e) {
+            logger.warning("Warning for ShopItem: " + config.getName());
+            logger.warning(e.getMessage() + ". Falling back to DEFAULT.");
+            confirmPurchaseMode = ConfirmPurchaseMode.DEFAULT;
+        }
 
         if (config.getName().contains(",")) {
             throw new RuntimeException("Item config '" + config.getName() + "' id/name CANNOT contain ',' characters.");
@@ -31,6 +41,7 @@ public class ShopItemParser {
             throw new RuntimeException("Failed to find a valid currency adapter for: " + config.getString("price.currency"));
         }
 
-        return new ShopItem(config.getName(), icon, commands, currency, amount, rarity, purchaseLimit <= 0 ? Integer.MAX_VALUE : purchaseLimit);
+        return new ShopItem(config.getName(), icon, commands, currency, amount, rarity, purchaseLimit <= 0 ? Integer.MAX_VALUE : purchaseLimit,
+            permission, confirmPurchaseMode);
     }
 }

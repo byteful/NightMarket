@@ -32,14 +32,43 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
 
         try (final Connection connection = this.connectionProvider.get(); final PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.execute();
+            this.migratePendingRotationColumn(connection);
         } catch (SQLException ex) {
-            this.logger.log(Level.SEVERE, "Failed to create NightMarket table.", ex);
+            this.logger.log(Level.SEVERE, "Failed to initialize NightMarket table.", ex);
+            throw new IllegalStateException("Failed to initialize NightMarket datastore schema.", ex);
         }
+    }
+
+    private void migratePendingRotationColumn(Connection connection) throws SQLException {
+        if (this.hasColumn(connection, "PendingRotation")) {
+            return;
+        }
+
+        try (final PreparedStatement statement = connection.prepareStatement(
+            "ALTER TABLE NightMarket ADD COLUMN PendingRotation BOOLEAN NOT NULL DEFAULT FALSE;")) {
+            statement.execute();
+        }
+    }
+
+    private boolean hasColumn(Connection connection, String columnName) throws SQLException {
+        final String[] tableNames = new String[]{"NightMarket", "nightmarket", "NIGHTMARKET"};
+        for (String tableName : tableNames) {
+            try (final ResultSet columns = connection.getMetaData().getColumns(connection.getCatalog(), null, tableName, null)) {
+                while (columns.next()) {
+                    if (columnName.equalsIgnoreCase(columns.getString("COLUMN_NAME"))) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     @Override
     public void setPlayerShop(PlayerShop shop) {
-        final String sql = "INSERT INTO NightMarket (ID, Purchased, Items) VALUES (?, ?, ?) " + this.upsertClause + " Purchased=?, Items=?;";
+        final String sql = "INSERT INTO NightMarket (ID, Purchased, Items, PendingRotation) VALUES (?, ?, ?, ?) " + this.upsertClause
+                           + " Purchased=?, Items=?, PendingRotation=?;";
 
         try (final Connection connection = this.connectionProvider.get(); final PreparedStatement statement = connection.prepareStatement(sql)) {
 
@@ -51,8 +80,10 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
             statement.setBytes(1, SQLUtils.serializeUUID(shop.getUniqueId()));
             statement.setString(2, purchasedSerialized);
             statement.setString(3, itemsSerialized);
-            statement.setString(4, purchasedSerialized);
-            statement.setString(5, itemsSerialized);
+            statement.setBoolean(4, shop.isPendingRotation());
+            statement.setString(5, purchasedSerialized);
+            statement.setString(6, itemsSerialized);
+            statement.setBoolean(7, shop.isPendingRotation());
 
             statement.execute();
         } catch (SQLException ex) {
@@ -73,8 +104,9 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
                 }
                 final List<String> purchased = SQLUtils.deserializeList(set.getString("Purchased"));
                 final List<String> items = SQLUtils.deserializeList(set.getString("Items"));
+                final boolean pendingRotation = set.getBoolean("PendingRotation");
 
-                return Optional.of(new PlayerShop(player, purchased, items));
+                return Optional.of(new PlayerShop(player, purchased, items, pendingRotation));
             }
         } catch (SQLException ex) {
             this.logger.log(Level.SEVERE, "Failed to get player shop data.", ex);
@@ -94,8 +126,9 @@ public abstract class SQLDataStoreProvider implements DataStoreProvider {
                 final UUID uuid = SQLUtils.deserializeUUID(result.getBytes("ID"));
                 final List<String> purchased = SQLUtils.deserializeList(result.getString("Purchased"));
                 final List<String> items = SQLUtils.deserializeList(result.getString("Items"));
+                final boolean pendingRotation = result.getBoolean("PendingRotation");
 
-                set.add(new PlayerShop(uuid, purchased, items));
+                set.add(new PlayerShop(uuid, purchased, items, pendingRotation));
             }
         } catch (SQLException ex) {
             this.logger.log(Level.SEVERE, "Failed to get all shops.", ex);

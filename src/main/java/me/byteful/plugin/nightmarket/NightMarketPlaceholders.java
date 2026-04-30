@@ -1,9 +1,5 @@
 package me.byteful.plugin.nightmarket;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -86,19 +82,19 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
             }
 
             case "rotate": {
-                return this.plugin.getRotateScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
+                return this.plugin.getScheduleReplacementService().getReplacements(player)[5];
             }
 
             case "open": {
-                return this.plugin.getAccessScheduleManager().getNextTime().format(DateTimeFormatter.ofPattern("MM/dd/yyyy hh:mm:ss a", Locale.US));
+                return this.plugin.getScheduleReplacementService().getReplacements(player)[1];
             }
 
             case "rotate_countdown": {
-                return this.getCountdown(this.plugin.getRotateScheduleManager().getNextTime());
+                return this.plugin.getScheduleReplacementService().getReplacements(player)[7];
             }
 
             case "open_countdown": {
-                return this.getCountdown(this.plugin.getAccessScheduleManager().getNextTime());
+                return this.plugin.getScheduleReplacementService().getReplacements(player)[3];
             }
 
             case "timezone": {
@@ -109,27 +105,5 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
                 return null;
             }
         }
-    }
-
-    private String getCountdown(LocalDateTime end) {
-        final Duration between = Duration.between(LocalDateTime.now(this.plugin.getTimezone()), end);
-        return this.convertDurationToString(between);
-    }
-
-    private String convertDurationToString(Duration duration) {
-        final long seconds = duration.getSeconds();
-        final long h = seconds / 3600;
-        final long m = (seconds % 3600) / 60;
-        final long s = seconds % 60;
-
-        StringBuilder sb = new StringBuilder();
-        if (h > 0) {
-            sb.append(h).append("h, ");
-        }
-        if (h > 0 || m > 0) {
-            sb.append(m).append("m, ");
-        }
-        sb.append(s).append("s");
-        return sb.toString();
     }
 }

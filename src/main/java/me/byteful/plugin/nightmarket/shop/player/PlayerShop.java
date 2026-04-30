@@ -4,51 +4,58 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.item.ShopItemRegistry;
-import me.byteful.plugin.nightmarket.util.Text;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 import redempt.redlib.misc.WeightedRandom;
 
 public class PlayerShop {
     private final UUID uniqueId;
     private final Map<String, Integer> purchasedShopItems;
     private List<String> shopItems;
+    private boolean pendingRotation;
 
     public PlayerShop(NightMarketPlugin plugin, ShopItemRegistry itemRegistry, UUID uniqueId) {
-        this.uniqueId = uniqueId;
-        this.shopItems = this.generateRandomShop(plugin, itemRegistry);
-        this.purchasedShopItems = new HashMap<>();
+        this(plugin, itemRegistry, uniqueId, null);
     }
 
-    private List<String> generateRandomShop(NightMarketPlugin plugin, ShopItemRegistry registry) {
+    public PlayerShop(NightMarketPlugin plugin, ShopItemRegistry itemRegistry, UUID uniqueId, Player player) {
+        this.uniqueId = uniqueId;
+        this.purchasedShopItems = new HashMap<>();
+        this.shopItems = new ArrayList<>();
+        if (player == null) {
+            this.pendingRotation = true;
+            plugin.debug("Created pending NightMarket shop for: " + this.uniqueId);
+        } else {
+            this.rotate(plugin, itemRegistry, player);
+        }
+    }
+
+    private List<String> generateRandomShop(NightMarketPlugin plugin, ShopItemRegistry registry, Player player) {
         plugin.debug("Creating a new, random shop for: " + this.uniqueId);
         final int maxItems = registry.getMaxItems();
-        if (registry.getAll().size() < maxItems) {
-            throw new RuntimeException("There are not enough items to generate shops! You need more items than slots in the GUI!");
+        final List<ShopItem> eligibleItems = new ArrayList<>(registry.getEligible(player));
+        if (eligibleItems.isEmpty()) {
+            plugin.getLogger().warning("No eligible NightMarket items are available for " + this.uniqueId + ".");
+            return new ArrayList<>();
         }
 
-        WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(registry.getAll(), x -> x, ShopItem::rarity);
+        List<ShopItem> rollItems = eligibleItems;
 
         if (this.shopItems != null && plugin.getConfig().getBoolean("other.prevent_repeat_items", false)) {
-            for (String currentItemId : this.shopItems) {
-                ShopItem currentItem = registry.get(currentItemId);
-                if (currentItem != null) {
-                    random.remove(currentItem);
-                }
-            }
-            if (random.getWeights().size() < maxItems) {
-                plugin.debug("Not enough items after excluding previous items, allowing repeats.");
-                random = WeightedRandom.fromCollection(registry.getAll(), x -> x, ShopItem::rarity);
+            final List<ShopItem> nonRepeatingItems = new ArrayList<>(eligibleItems);
+            nonRepeatingItems.removeIf(item -> this.shopItems.contains(item.id()));
+            if (nonRepeatingItems.size() >= maxItems) {
+                rollItems = nonRepeatingItems;
             }
         }
 
+        WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(rollItems, x -> x, ShopItem::rarity);
         final List<String> generated = new ArrayList<>();
-        for (int i = 0; i < maxItems; i++) {
+        final int itemCount = Math.min(maxItems, random.getWeights().size());
+        for (int i = 0; i < itemCount; i++) {
             final ShopItem item = random.roll();
             random.remove(item);
             generated.add(item.id());
@@ -59,14 +66,22 @@ public class PlayerShop {
     }
 
     public PlayerShop(UUID uniqueId, List<String> purchasedShopItems, List<String> shopItems) {
+        this(uniqueId, purchasedShopItems, shopItems, false);
+    }
+
+    public PlayerShop(UUID uniqueId, List<String> purchasedShopItems, List<String> shopItems, boolean pendingRotation) {
         this.uniqueId = uniqueId;
         this.purchasedShopItems = deserializePurchased(purchasedShopItems);
-        this.shopItems = shopItems;
+        this.shopItems = new ArrayList<>(shopItems);
+        this.pendingRotation = pendingRotation;
     }
 
     private static Map<String, Integer> deserializePurchased(List<String> list) {
         final Map<String, Integer> map = new HashMap<>();
         for (String data : list) {
+            if (data == null || data.isEmpty()) {
+                continue;
+            }
             if (!data.contains(":")) {
                 map.put(data, 1);
 
@@ -92,6 +107,15 @@ public class PlayerShop {
         this.shopItems = shopItems;
     }
 
+    public boolean isPendingRotation() {
+        return this.pendingRotation;
+    }
+
+    public void markPendingRotation(NightMarketPlugin plugin) {
+        this.pendingRotation = true;
+        plugin.debug("Marked NightMarket shop pending rotation: " + this.uniqueId);
+    }
+
     public Map<String, Integer> getPurchasedShopItems() {
         return this.purchasedShopItems;
     }
@@ -107,26 +131,27 @@ public class PlayerShop {
         return this.purchasedShopItems.getOrDefault(item, 0);
     }
 
-    public void purchaseItem(NightMarketPlugin plugin, ShopItem item) {
+    public void recordPurchase(NightMarketPlugin plugin, ShopItem item) {
         this.purchasedShopItems.merge(item.id(), 1, Integer::sum);
         plugin.getPlayerShopManager().getGlobalPurchaseCounts().merge(item.id(), 1, Integer::sum);
-        final OfflinePlayer player = Bukkit.getOfflinePlayer(this.uniqueId);
-
-        for (String cmd : item.commands()) {
-            cmd = cmd.startsWith("/") ? cmd.substring(1) : cmd;
-            cmd = cmd.replace("{player}", Objects.requireNonNull(player.getName()));
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), Text.applyPAPI(player, cmd));
-        }
-
-        item.currency().withdraw(this.uniqueId, item.amount());
         plugin.debug("Player purchased item: " + item.id() + " (" + this.uniqueId + ")");
     }
 
     public void rotate(NightMarketPlugin plugin, ShopItemRegistry registry) {
+        this.markPendingRotation(plugin);
+    }
+
+    public void rotate(NightMarketPlugin plugin, ShopItemRegistry registry, Player player) {
+        if (player == null) {
+            this.markPendingRotation(plugin);
+            return;
+        }
+
         plugin.debug("Rotating player shop: " + this.uniqueId);
         plugin.debug("Old shop: " + String.join(",", this.shopItems));
-        this.shopItems = this.generateRandomShop(plugin, registry);
+        this.shopItems = this.generateRandomShop(plugin, registry, player);
         plugin.debug("New shop: " + String.join(",", this.shopItems));
         this.purchasedShopItems.clear();
+        this.pendingRotation = false;
     }
 }

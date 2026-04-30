@@ -1,14 +1,18 @@
 package me.byteful.plugin.nightmarket.parser;
 
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.scheduler.ScheduledTask;
+import me.byteful.plugin.nightmarket.shop.item.ConfirmPurchaseMode;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
+import me.byteful.plugin.nightmarket.shop.player.PurchaseResult;
+import me.byteful.plugin.nightmarket.util.Text;
 import me.byteful.plugin.nightmarket.util.text.TextProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
@@ -27,6 +31,9 @@ public class GUIParser {
         final int updateFrequency = config.getInt("update", -1);
         Preconditions.checkArgument(rows > 0 && rows < 7, "Rows needs to be greater than 0 and less than 7!");
         final IconData backgroundIcon = IconParser.parse(config.getConfigurationSection("background_icon"));
+        final IconData unavailableIcon = config.contains("unavailable_icon")
+                                         ? IconParser.parse(config.getConfigurationSection("unavailable_icon"))
+                                         : backgroundIcon;
         final List<String> backgroundSlots = config.getStringList("background_slots");
         final List<String> itemSlots = config.getStringList("item_slots");
         Preconditions.checkArgument(!itemSlots.isEmpty(), "Item slots need to be greater than 0!");
@@ -44,8 +51,8 @@ public class GUIParser {
             });
         }
 
-        return new ParsedGUI(backgroundIcon, SlotNumberParser.parse(backgroundSlots), SlotNumberParser.parse(itemSlots), extraIcons, title, rows,
-            updateFrequency);
+        return new ParsedGUI(backgroundIcon, unavailableIcon, SlotNumberParser.parse(backgroundSlots),
+            SlotNumberParser.parse(itemSlots), extraIcons, title, rows, updateFrequency);
     }
 
     public static class ExtraIcon {
@@ -72,6 +79,8 @@ public class GUIParser {
         @NotNull
         private final IconData backgroundIcon;
         @NotNull
+        private final IconData unavailableIcon;
+        @NotNull
         private final List<Integer> backgroundSlots;
         @NotNull
         private final List<Integer> itemSlots;
@@ -81,11 +90,11 @@ public class GUIParser {
         private final String title;
         private final int rows;
         private final int updateFrequency;
-        private String legacyTitle;
 
-        public ParsedGUI(@NotNull IconData backgroundIcon, @NotNull List<Integer> backgroundSlots, @NotNull List<Integer> itemSlots,
+        public ParsedGUI(@NotNull IconData backgroundIcon, @NotNull IconData unavailableIcon, @NotNull List<Integer> backgroundSlots, @NotNull List<Integer> itemSlots,
                          @NotNull Set<ExtraIcon> extraIcons, @NotNull String title, int rows, int updateFrequency) {
             this.backgroundIcon = backgroundIcon;
+            this.unavailableIcon = unavailableIcon;
             this.backgroundSlots = backgroundSlots;
             this.itemSlots = itemSlots;
             this.extraIcons = extraIcons;
@@ -100,14 +109,31 @@ public class GUIParser {
 
         @NotNull
         public InventoryGUI build(@NotNull PlayerShop player, @NotNull NightMarketPlugin plugin) {
-            final Player bukkitPlayer = Bukkit.getPlayer(player.getUniqueId());
+            return this.build(player, plugin, Bukkit.getPlayer(player.getUniqueId()), Bukkit.getPlayer(player.getUniqueId()), false, true, this.title);
+        }
+
+        @NotNull
+        public InventoryGUI buildReadOnly(@NotNull PlayerShop shop, @NotNull NightMarketPlugin plugin, @NotNull Player viewer, Player targetPlayer,
+                                          @NotNull String viewedName) {
+            final String configuredTitle = plugin.getConfig().getString("admin_view.title");
+            Preconditions.checkNotNull(configuredTitle, "admin_view.title needs to not be null!");
+            final String title = configuredTitle.replace("{player}", viewedName);
+
+            return this.build(shop, plugin, viewer, targetPlayer, true, false, title);
+        }
+
+        @NotNull
+        private InventoryGUI build(@NotNull PlayerShop player, @NotNull NightMarketPlugin plugin, Player viewer, Player targetPlayer, boolean readOnly,
+                                   boolean persistRepairs, String title) {
+            final Player bukkitPlayer = viewer;
             final TextProvider tp = plugin.getTextProvider();
 
             plugin.debug("Building NightMarket GUI for: " + player.getUniqueId());
             plugin.debug("Items list: " + String.join(",", player.getShopItems()));
             plugin.debug("Purchased items list: " + String.join(",", player.getPurchasedShopItems().keySet()));
-            final InventoryGUI gui = new InventoryGUI(this.rows * 9, this.getLegacyTitle(tp));
-            final ItemButton bgButton = ItemButton.create(tp.buildItem(this.backgroundIcon), (e) -> {
+            final InventoryGUI gui = new InventoryGUI(this.rows * 9, this.getLegacyTitle(tp, bukkitPlayer, plugin, title));
+            final ItemButton bgButton = ItemButton.create(tp.buildItem(bukkitPlayer, this.backgroundIcon,
+                plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), (e) -> {
             });
 
             final Runnable reloadBackground = () -> {
@@ -119,7 +145,8 @@ public class GUIParser {
 
             final Runnable reloadExtraIcons = () -> {
                 for (ExtraIcon extraIcon : this.extraIcons) {
-                    final ItemButton iconButton = ItemButton.create(tp.buildItem(bukkitPlayer, extraIcon.getIcon()), (e) -> {
+                    final ItemButton iconButton = ItemButton.create(tp.buildItem(bukkitPlayer, extraIcon.getIcon(),
+                        plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), (e) -> {
                     });
 
                     for (Integer slot : extraIcon.getSlots()) {
@@ -129,14 +156,26 @@ public class GUIParser {
             };
             reloadExtraIcons.run();
 
-            final List<String> finalItems = this.validateAndResizeShopItems(player, plugin);
+            final List<String> finalItems = this.validateAndResizeShopItems(player, plugin, targetPlayer, persistRepairs);
 
             final Runnable reloadItemIcons = () -> {
                 final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
                 for (int i = 0; i < this.itemSlots.size(); i++) {
                     final Integer slot = this.itemSlots.get(i);
+                    if (i >= finalItems.size()) {
+                        gui.addButton(slot, ItemButton.create(tp.buildItem(bukkitPlayer, this.unavailableIcon,
+                            plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), event -> {
+                        }));
+                        continue;
+                    }
                     final ShopItem item = plugin.getShopItemRegistry().get(finalItems.get(i));
-                    gui.addButton(slot, this.createItemButton(item, player, bukkitPlayer, plugin, globalCheck));
+                    if (item == null) {
+                        gui.addButton(slot, ItemButton.create(tp.buildItem(bukkitPlayer, this.unavailableIcon,
+                            plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), event -> {
+                        }));
+                        continue;
+                    }
+                    gui.addButton(slot, this.createItemButton(item, player, bukkitPlayer, plugin, globalCheck, readOnly));
                 }
             };
             reloadItemIcons.run();
@@ -165,18 +204,24 @@ public class GUIParser {
             return gui;
         }
 
-        private String getLegacyTitle(TextProvider tp) {
-            String cached = this.legacyTitle;
-            if (cached == null) {
-                cached = tp.toLegacy(this.title);
-                this.legacyTitle = cached;
-            }
-            return cached;
+        private String getLegacyTitle(TextProvider tp, Player player, NightMarketPlugin plugin, String title) {
+            return tp.toLegacy(Text.applyPAPIAndReplace(player, title, plugin.getScheduleReplacementService().getReplacements(player)));
         }
 
-        private List<String> validateAndResizeShopItems(PlayerShop player, NightMarketPlugin plugin) {
+        private List<String> validateAndResizeShopItems(PlayerShop player, NightMarketPlugin plugin, Player targetPlayer, boolean persistRepairs) {
+            if (!persistRepairs) {
+                final List<String> displayItems = new ArrayList<>(player.getShopItems());
+                if (displayItems.size() > this.itemSlots.size()) {
+                    return new ArrayList<>(displayItems.subList(0, this.itemSlots.size()));
+                }
+                return displayItems;
+            }
+
             List<String> items = player.getShopItems();
-            boolean changed = items.removeIf(x -> plugin.getShopItemRegistry().get(x) == null);
+            boolean changed = items.removeIf(x -> {
+                final ShopItem item = plugin.getShopItemRegistry().get(x);
+                return item == null || !plugin.getShopItemRegistry().isEligible(targetPlayer, item);
+            });
 
             if (items.size() > this.itemSlots.size()) {
                 plugin.debug("(1) GUI was previously resized. Old items list: " + String.join(",", items));
@@ -189,12 +234,18 @@ public class GUIParser {
             if (items.size() < this.itemSlots.size()) {
                 plugin.debug("(2) GUI was previously resized. Old items list: " + String.join(",", items));
                 final int diff = this.itemSlots.size() - items.size();
-                final WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(plugin.getShopItemRegistry().getAll(), x -> x, ShopItem::rarity);
-                items.forEach(x -> random.remove(plugin.getShopItemRegistry().get(x)));
-                if (random.getWeights().size() < diff) {
-                    throw new RuntimeException("There are not enough items to generate shops! You need more items than slots in the GUI!");
+                final List<ShopItem> eligibleItems = targetPlayer == null
+                                                     ? plugin.getShopItemRegistry().getUngated()
+                                                     : plugin.getShopItemRegistry().getEligible(targetPlayer);
+                if (eligibleItems.isEmpty()) {
+                    player.setShopItems(items);
+                    plugin.debug("No eligible items available to fill resized GUI.");
+                    return items;
                 }
-                for (int i = 0; i < diff; i++) {
+                final WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(eligibleItems, x -> x, ShopItem::rarity);
+                items.forEach(x -> random.remove(plugin.getShopItemRegistry().get(x)));
+                final int fillCount = Math.min(diff, random.getWeights().size());
+                for (int i = 0; i < fillCount; i++) {
                     final ShopItem item = random.roll();
                     random.remove(item);
                     items.add(item.id());
@@ -212,26 +263,50 @@ public class GUIParser {
             return items;
         }
 
-        private ItemButton createItemButton(ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin, boolean globalCheck) {
-            final TextProvider tp = plugin.getTextProvider();
+        public String[] getItemReplacements(ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin) {
+            final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
             final int purchased = globalCheck ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(item.id());
-            final int stock = item.purchaseLimit();
+            return this.getItemReplacements(item, player, bukkitPlayer, plugin, this.getStatusText(item, player, bukkitPlayer, plugin, purchased),
+                purchased);
+        }
 
-            String statusText;
+        public String[] getItemPreviewReplacements(ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin) {
+            final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
+            final int purchased = globalCheck ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(item.id());
+            return this.getItemReplacements(item, player, bukkitPlayer, plugin, plugin.getMessageManager().get("status_item_preview"), purchased);
+        }
+
+        private String[] getItemReplacements(ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin, String status,
+                                             int purchased) {
+            final int stock = item.purchaseLimit();
+            return plugin.getScheduleReplacementService().append(bukkitPlayer,
+                "{stock}", stock == Integer.MAX_VALUE ? plugin.getMessageManager().get("infinite_stock") : "" + stock,
+                "{purchase_count}", "" + purchased,
+                "{status}", status,
+                "{item}", item.id(),
+                "{price}", Text.formatPrice(plugin.getConfig(), item));
+        }
+
+        private String getStatusText(ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin, int purchased) {
+            final int stock = item.purchaseLimit();
             if (purchased >= stock) {
-                statusText = plugin.getMessageManager().get("status_bought_out");
+                return plugin.getMessageManager().get("status_bought_out");
             } else if (bukkitPlayer != null && bukkitPlayer.getInventory().firstEmpty() == -1) {
-                statusText = plugin.getMessageManager().get("status_inventory_full");
-            } else {
-                statusText = plugin.getMessageManager().get("status_available");
+                return plugin.getMessageManager().get("status_inventory_full");
+            } else if (bukkitPlayer != null && !plugin.getShopItemRegistry().isEligible(bukkitPlayer, item)) {
+                return plugin.getMessageManager().get("status_no_permission");
             }
+            return plugin.getMessageManager().get("status_available");
+        }
+
+        private ItemButton createItemButton(ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin, boolean globalCheck,
+                                            boolean readOnly) {
+            final TextProvider tp = plugin.getTextProvider();
+            final String[] replacements = this.getItemReplacements(item, player, bukkitPlayer, plugin);
 
             ItemStack isIcon;
             if (bukkitPlayer != null && bukkitPlayer.isOnline()) {
-                isIcon = tp.buildItem(bukkitPlayer, item.icon(),
-                    "{stock}", stock == Integer.MAX_VALUE ? plugin.getMessageManager().get("infinite_stock") : "" + stock,
-                    "{purchase_count}", "" + purchased,
-                    "{status}", statusText);
+                isIcon = tp.buildItem(bukkitPlayer, item.icon(), replacements);
             } else {
                 isIcon = tp.buildItem(item.icon());
             }
@@ -242,39 +317,40 @@ public class GUIParser {
                     return;
                 }
 
-                final boolean globalPurchaseLimits = plugin.getConfig().getBoolean("other.global_purchase_limits");
-                final int purchaseCount = globalPurchaseLimits ? plugin.getPlayerShopManager().getGlobalPurchaseCount(item) : player.getPurchaseCount(
-                    item.id());
-                final String messageKey = globalPurchaseLimits ? "item_max_global_purchases" : "already_purchased";
-
-                if (purchaseCount >= item.purchaseLimit()) {
-                    plugin.sendMessage(clicker, clicker, messageKey);
-                    clicker.closeInventory();
+                if (readOnly) {
+                    plugin.sendMessage(clicker, clicker, "admin_view_read_only");
                     return;
                 }
 
-                if (!item.currency().canPlayerAfford(player.getUniqueId(), item.amount())) {
-                    String formatted = item.currency().format(item.amount());
-                    if (plugin.getConfig().getBoolean("other.lowercase_currency_names")) {
-                        formatted = formatted.toLowerCase();
-                    }
-
-                    plugin.sendMessage(clicker, clicker, "cannot_afford", "{amount}", formatted, "{currency}", "");
-                    clicker.closeInventory();
-                    return;
-                }
-
-                player.purchaseItem(plugin, item);
-                plugin.getScheduler().runAsync(() -> plugin.getDataStoreProvider().setPlayerShop(player));
-                if (plugin.getConfig().getBoolean("other.close_on_buy")) {
-                    clicker.closeInventory();
-                }
-                plugin.sendMessage(clicker, clicker, "successfully_purchased_item", "{item}", item.id());
+                plugin.getScheduler().runForPlayer(clicker, () -> this.handlePurchaseClick(item, player, clicker, plugin));
             });
         }
 
+        private void handlePurchaseClick(ShopItem item, PlayerShop player, Player clicker, NightMarketPlugin plugin) {
+            final PurchaseResult validation = plugin.getPurchaseService().validate(clicker, player, item);
+            if (!validation.success()) {
+                plugin.sendMessage(clicker, clicker, validation.messageKey(), validation.replacements());
+                clicker.closeInventory();
+                return;
+            }
+
+            final boolean globalConfirm = plugin.getPurchaseConfirmationGUI().isEnabled();
+            final boolean shouldConfirm = item.confirmPurchaseMode() == ConfirmPurchaseMode.ENABLED
+                                          || item.confirmPurchaseMode() == ConfirmPurchaseMode.DEFAULT && globalConfirm;
+            if (shouldConfirm) {
+                plugin.getPurchaseConfirmationGUI().build(clicker, player, item, plugin).open(clicker);
+                return;
+            }
+
+            final PurchaseResult result = plugin.getPurchaseService().attemptPurchase(clicker, player, item);
+            plugin.sendMessage(clicker, clicker, result.messageKey(), result.replacements());
+            if (result.success() && plugin.getConfig().getBoolean("other.close_on_buy")) {
+                clicker.closeInventory();
+            }
+        }
+
         public void close(TextProvider tp) {
-            final String lookFor = this.getLegacyTitle(tp);
+            final String lookFor = tp.toLegacy(this.title);
             for (Player player : Bukkit.getOnlinePlayers()) {
                 if (player.getOpenInventory().getTitle().equals(lookFor)) {
                     player.closeInventory();
