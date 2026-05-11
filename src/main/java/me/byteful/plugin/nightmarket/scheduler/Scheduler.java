@@ -9,6 +9,8 @@ public interface Scheduler {
 
     void runForPlayer(Player player, Runnable runnable);
 
+    ScheduledTask runForPlayerTimer(Player player, Runnable runnable, long delayTicks, long periodTicks);
+
     ScheduledTask runGlobalTimer(Runnable runnable, long delayTicks, long periodTicks);
 
     void runGlobalDelayed(Runnable runnable, long delayTicks);

@@ -29,6 +29,11 @@ public class BukkitSchedulerImpl implements Scheduler {
     }
 
     @Override
+    public ScheduledTask runForPlayerTimer(Player player, Runnable runnable, long delayTicks, long periodTicks) {
+        return Bukkit.getScheduler().runTaskTimer(this.plugin, runnable, delayTicks, periodTicks)::cancel;
+    }
+
+    @Override
     public ScheduledTask runGlobalTimer(Runnable runnable, long delayTicks, long periodTicks) {
         return Bukkit.getScheduler().runTaskTimer(this.plugin, runnable, delayTicks, periodTicks)::cancel;
     }

@@ -6,22 +6,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
+import me.byteful.plugin.nightmarket.gui.NightMarketGui;
 import me.byteful.plugin.nightmarket.scheduler.ScheduledTask;
 import me.byteful.plugin.nightmarket.shop.item.ConfirmPurchaseMode;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
 import me.byteful.plugin.nightmarket.shop.player.PurchaseResult;
 import me.byteful.plugin.nightmarket.util.Text;
+import me.byteful.plugin.nightmarket.util.WeightedPicker;
 import me.byteful.plugin.nightmarket.util.text.TextProvider;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
-import redempt.redlib.inventorygui.InventoryGUI;
-import redempt.redlib.inventorygui.ItemButton;
-import redempt.redlib.misc.WeightedRandom;
 
 public class GUIParser {
     @NotNull
@@ -108,12 +109,12 @@ public class GUIParser {
         }
 
         @NotNull
-        public InventoryGUI build(@NotNull PlayerShop player, @NotNull NightMarketPlugin plugin) {
+        public NightMarketGui build(@NotNull PlayerShop player, @NotNull NightMarketPlugin plugin) {
             return this.build(player, plugin, Bukkit.getPlayer(player.getUniqueId()), Bukkit.getPlayer(player.getUniqueId()), false, true, this.title);
         }
 
         @NotNull
-        public InventoryGUI buildReadOnly(@NotNull PlayerShop shop, @NotNull NightMarketPlugin plugin, @NotNull Player viewer, Player targetPlayer,
+        public NightMarketGui buildReadOnly(@NotNull PlayerShop shop, @NotNull NightMarketPlugin plugin, @NotNull Player viewer, Player targetPlayer,
                                           @NotNull String viewedName) {
             final String configuredTitle = plugin.getConfig().getString("admin_view.title");
             Preconditions.checkNotNull(configuredTitle, "admin_view.title needs to not be null!");
@@ -123,34 +124,32 @@ public class GUIParser {
         }
 
         @NotNull
-        private InventoryGUI build(@NotNull PlayerShop player, @NotNull NightMarketPlugin plugin, Player viewer, Player targetPlayer, boolean readOnly,
-                                   boolean persistRepairs, String title) {
+        private NightMarketGui build(@NotNull PlayerShop player, @NotNull NightMarketPlugin plugin, Player viewer, Player targetPlayer, boolean readOnly,
+                                     boolean persistRepairs, String title) {
             final Player bukkitPlayer = viewer;
             final TextProvider tp = plugin.getTextProvider();
 
             plugin.debug("Building NightMarket GUI for: " + player.getUniqueId());
             plugin.debug("Items list: " + String.join(",", player.getShopItems()));
             plugin.debug("Purchased items list: " + String.join(",", player.getPurchasedShopItems().keySet()));
-            final InventoryGUI gui = new InventoryGUI(this.rows * 9, this.getLegacyTitle(tp, bukkitPlayer, plugin, title));
-            final ItemButton bgButton = ItemButton.create(tp.buildItem(bukkitPlayer, this.backgroundIcon,
-                plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), (e) -> {
-            });
+            final NightMarketGui gui = new NightMarketGui(plugin, this.rows, this.getLegacyTitle(tp, bukkitPlayer, plugin, title));
 
             final Runnable reloadBackground = () -> {
+                final ItemStack backgroundItem = tp.buildItem(bukkitPlayer, this.backgroundIcon,
+                    plugin.getScheduleReplacementService().getReplacements(bukkitPlayer));
                 for (Integer slot : this.backgroundSlots) {
-                    gui.addButton(slot, bgButton);
+                    gui.setItem(slot, backgroundItem);
                 }
             };
             reloadBackground.run();
 
             final Runnable reloadExtraIcons = () -> {
                 for (ExtraIcon extraIcon : this.extraIcons) {
-                    final ItemButton iconButton = ItemButton.create(tp.buildItem(bukkitPlayer, extraIcon.getIcon(),
-                        plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), (e) -> {
-                    });
+                    final ItemStack extraItem = tp.buildItem(bukkitPlayer, extraIcon.getIcon(),
+                        plugin.getScheduleReplacementService().getReplacements(bukkitPlayer));
 
                     for (Integer slot : extraIcon.getSlots()) {
-                        gui.addButton(slot, iconButton);
+                        gui.setItem(slot, extraItem);
                     }
                 }
             };
@@ -159,46 +158,55 @@ public class GUIParser {
             final List<String> finalItems = this.validateAndResizeShopItems(player, plugin, targetPlayer, persistRepairs);
 
             final Runnable reloadItemIcons = () -> {
-                final boolean globalCheck = plugin.getConfig().getBoolean("other.global_purchase_limits");
                 for (int i = 0; i < this.itemSlots.size(); i++) {
                     final Integer slot = this.itemSlots.get(i);
                     if (i >= finalItems.size()) {
-                        gui.addButton(slot, ItemButton.create(tp.buildItem(bukkitPlayer, this.unavailableIcon,
-                            plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), event -> {
-                        }));
+                        gui.setItem(slot, tp.buildItem(bukkitPlayer, this.unavailableIcon,
+                            plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)));
                         continue;
                     }
                     final ShopItem item = plugin.getShopItemRegistry().get(finalItems.get(i));
                     if (item == null) {
-                        gui.addButton(slot, ItemButton.create(tp.buildItem(bukkitPlayer, this.unavailableIcon,
-                            plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)), event -> {
-                        }));
+                        gui.setItem(slot, tp.buildItem(bukkitPlayer, this.unavailableIcon,
+                            plugin.getScheduleReplacementService().getReplacements(bukkitPlayer)));
                         continue;
                     }
-                    gui.addButton(slot, this.createItemButton(item, player, bukkitPlayer, plugin, globalCheck, readOnly));
+                    this.setShopItem(gui, slot, item, player, bukkitPlayer, plugin, readOnly);
                 }
             };
             reloadItemIcons.run();
 
             if (this.updateFrequency > 0) {
                 final AtomicReference<ScheduledTask> taskRef = new AtomicReference<>();
-                final ScheduledTask updateTask = plugin.getScheduler().runGlobalTimer(() -> {
-                    if (gui.getInventory() == null || gui.getInventory().isEmpty()) {
-                        final ScheduledTask self = taskRef.get();
-                        if (self != null) {
-                            self.cancel();
-                        }
+                gui.setOnOpen(event -> {
+                    if (taskRef.get() != null) {
                         return;
                     }
-                    gui.clear();
-                    reloadBackground.run();
-                    reloadExtraIcons.run();
-                    reloadItemIcons.run();
-                    gui.update();
-                }, this.updateFrequency, this.updateFrequency);
-                taskRef.set(updateTask);
 
-                gui.setOnDestroy(updateTask::cancel);
+                    final ScheduledTask updateTask = plugin.getScheduler().runForPlayerTimer(bukkitPlayer, () -> {
+                        if (gui.getViewerCount() <= 0) {
+                            final ScheduledTask self = taskRef.get();
+                            if (self != null) {
+                                self.cancel();
+                                taskRef.set(null);
+                            }
+                            return;
+                        }
+                        gui.clear();
+                        reloadBackground.run();
+                        reloadExtraIcons.run();
+                        reloadItemIcons.run();
+                        gui.update();
+                    }, this.updateFrequency, this.updateFrequency);
+                    taskRef.set(updateTask);
+                });
+
+                gui.setOnClose(event -> {
+                    final ScheduledTask updateTask = taskRef.getAndSet(null);
+                    if (updateTask != null) {
+                        updateTask.cancel();
+                    }
+                });
             }
 
             return gui;
@@ -242,9 +250,9 @@ public class GUIParser {
                     plugin.debug("No eligible items available to fill resized GUI.");
                     return items;
                 }
-                final WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(eligibleItems, x -> x, ShopItem::rarity);
+                final WeightedPicker<ShopItem> random = WeightedPicker.fromCollection(eligibleItems, ShopItem::rarity);
                 items.forEach(x -> random.remove(plugin.getShopItemRegistry().get(x)));
-                final int fillCount = Math.min(diff, random.getWeights().size());
+                final int fillCount = Math.min(diff, random.size());
                 for (int i = 0; i < fillCount; i++) {
                     final ShopItem item = random.roll();
                     random.remove(item);
@@ -299,8 +307,8 @@ public class GUIParser {
             return plugin.getMessageManager().get("status_available");
         }
 
-        private ItemButton createItemButton(ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin, boolean globalCheck,
-                                            boolean readOnly) {
+        private void setShopItem(NightMarketGui gui, int slot, ShopItem item, PlayerShop player, Player bukkitPlayer, NightMarketPlugin plugin,
+                                 boolean readOnly) {
             final TextProvider tp = plugin.getTextProvider();
             final String[] replacements = this.getItemReplacements(item, player, bukkitPlayer, plugin);
 
@@ -311,7 +319,7 @@ public class GUIParser {
                 isIcon = tp.buildItem(item.icon());
             }
 
-            return ItemButton.create(isIcon, e -> {
+            final Consumer<InventoryClickEvent> clickHandler = e -> {
                 plugin.debug("Clicked GUI button: " + e.getWhoClicked().getName());
                 if (!(e.getWhoClicked() instanceof Player clicker)) {
                     return;
@@ -323,7 +331,8 @@ public class GUIParser {
                 }
 
                 plugin.getScheduler().runForPlayer(clicker, () -> this.handlePurchaseClick(item, player, clicker, plugin));
-            });
+            };
+            gui.setItem(slot, isIcon, clickHandler);
         }
 
         private void handlePurchaseClick(ShopItem item, PlayerShop player, Player clicker, NightMarketPlugin plugin) {

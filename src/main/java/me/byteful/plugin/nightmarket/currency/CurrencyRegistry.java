@@ -5,6 +5,7 @@ import java.util.Map;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.impl.CoinsEngineCurrency;
 import me.byteful.plugin.nightmarket.currency.impl.EcoBitsCurrency;
+import me.byteful.plugin.nightmarket.currency.impl.ExcellentEconomyCurrency;
 import me.byteful.plugin.nightmarket.currency.impl.PlayerPointsCurrency;
 import me.byteful.plugin.nightmarket.currency.impl.VaultCurrency;
 import org.bukkit.Bukkit;
@@ -32,6 +33,9 @@ public class CurrencyRegistry {
         }
         if (!new CoinsEngineCurrency.CoinsEngineCurrencyHandler(this).registerAll()) {
             this.plugin.getLogger().info("Skipped loading currency adapter: coinsengine");
+        }
+        if (!new ExcellentEconomyCurrency.ExcellentEconomyCurrencyHandler(this).registerAll()) {
+            this.plugin.getLogger().info("Skipped loading currency adapter: excellenteconomy");
         }
 
         this.isLoaded = true;

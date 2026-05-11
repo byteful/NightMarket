@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
-import redempt.redlib.RedLib;
+import me.byteful.plugin.nightmarket.util.MinecraftVersion;
 
 // Much of this code was borrowed from lucko's helper library. Adapted by byteful to support isolated class loaders.
 public final class LibraryLoader {
@@ -30,7 +30,7 @@ public final class LibraryLoader {
     }
 
     public static IsolatedClassLoader load(NightMarketPlugin plugin, Dependency d) {
-        if (RedLib.MID_VERSION >= 17) {
+        if (MinecraftVersion.current().supportsSpigotLibraryLoading()) {
             return null; // We don't need to do this ourselves because Spigot has library loading support now!
         }
         final String name = d.artifactId() + "-" + d.version();
@@ -91,7 +91,7 @@ public final class LibraryLoader {
     }
 
     public static void loadWithInject(NightMarketPlugin plugin, Dependency d) {
-        if (RedLib.MID_VERSION >= 17) {
+        if (MinecraftVersion.current().supportsSpigotLibraryLoading()) {
             return; // We don't need to do this ourselves because Spigot has library loading support now!
         }
 

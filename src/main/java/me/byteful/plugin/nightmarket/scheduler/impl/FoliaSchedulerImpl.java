@@ -29,6 +29,11 @@ public class FoliaSchedulerImpl implements Scheduler {
     }
 
     @Override
+    public ScheduledTask runForPlayerTimer(Player player, Runnable runnable, long delayTicks, long periodTicks) {
+        return player.getScheduler().runAtFixedRate(this.plugin, t -> runnable.run(), null, delayTicks, periodTicks)::cancel;
+    }
+
+    @Override
     public ScheduledTask runGlobalTimer(Runnable runnable, long delayTicks, long periodTicks) {
         return Bukkit.getGlobalRegionScheduler().runAtFixedRate(this.plugin, t -> runnable.run(), delayTicks, periodTicks)::cancel;
     }

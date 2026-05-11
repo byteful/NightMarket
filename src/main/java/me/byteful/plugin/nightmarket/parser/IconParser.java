@@ -6,12 +6,12 @@ import com.cryptomorin.xseries.profiles.objects.Profileable;
 import com.google.common.base.Preconditions;
 import java.util.List;
 import java.util.Objects;
+import me.byteful.plugin.nightmarket.util.MinecraftVersion;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
-import redempt.redlib.RedLib;
 
 public class IconParser {
     public static IconData parse(ConfigurationSection config) {
@@ -60,7 +60,7 @@ public class IconParser {
     }
 
     private static void applyBaseMeta(Integer customModelData, ItemStack item) {
-        if (customModelData != null && RedLib.MID_VERSION >= 14) {
+        if (customModelData != null && MinecraftVersion.current().supportsCustomModelData()) {
             final ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 meta.setCustomModelData(customModelData);

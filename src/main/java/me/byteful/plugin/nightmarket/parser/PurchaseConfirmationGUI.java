@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
+import me.byteful.plugin.nightmarket.gui.NightMarketGui;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
 import me.byteful.plugin.nightmarket.shop.player.PurchaseResult;
@@ -12,8 +13,6 @@ import me.byteful.plugin.nightmarket.util.Text;
 import me.byteful.plugin.nightmarket.util.text.TextProvider;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
-import redempt.redlib.inventorygui.InventoryGUI;
-import redempt.redlib.inventorygui.ItemButton;
 
 public class PurchaseConfirmationGUI {
     private final boolean enabled;
@@ -105,57 +104,52 @@ public class PurchaseConfirmationGUI {
         return this.enabled;
     }
 
-    public InventoryGUI build(Player clicker, PlayerShop shop, ShopItem item, NightMarketPlugin plugin) {
+    public NightMarketGui build(Player clicker, PlayerShop shop, ShopItem item, NightMarketPlugin plugin) {
         final TextProvider tp = plugin.getTextProvider();
-        final InventoryGUI gui = new InventoryGUI(this.rows * 9, this.getLegacyTitle(tp, clicker, item, plugin));
-        final ItemButton backgroundButton = ItemButton.create(tp.buildItem(clicker, this.backgroundIcon,
-            plugin.getScheduleReplacementService().getReplacements(clicker)), event -> {
-        });
+        final NightMarketGui gui = new NightMarketGui(plugin, this.rows, this.getLegacyTitle(tp, clicker, item, plugin));
         for (Integer slot : this.backgroundSlots) {
-            gui.addButton(slot, backgroundButton);
+            gui.setItem(slot, tp.buildItem(clicker, this.backgroundIcon, plugin.getScheduleReplacementService().getReplacements(clicker)));
         }
 
-        gui.addButton(this.previewSlot, ItemButton.create(tp.buildItem(clicker, item.icon(),
-            plugin.getParsedGUI().getItemPreviewReplacements(item, shop, clicker, plugin)), event -> {}));
-        final ItemButton confirmButton = ItemButton.create(tp.buildItem(clicker, this.confirmIcon,
-            plugin.getParsedGUI().getItemReplacements(item, shop, clicker, plugin)), event -> {
-            if (!(event.getWhoClicked() instanceof Player player)) {
-                return;
-            }
-            plugin.getScheduler().runForPlayer(player, () -> {
-                final PurchaseResult result = plugin.getPurchaseService().attemptPurchase(player, shop, item);
-                plugin.sendMessage(player, player, result.messageKey(), result.replacements());
-                if (result.success()) {
-                    if (plugin.getConfig().getBoolean("other.close_on_buy")) {
-                        player.closeInventory();
-                    } else if (plugin.getAccessScheduleManager().isShopOpen()) {
+        gui.setItem(this.previewSlot, tp.buildItem(clicker, item.icon(),
+            plugin.getParsedGUI().getItemPreviewReplacements(item, shop, clicker, plugin)));
+        for (Integer slot : this.confirmSlots) {
+            gui.setItem(slot, tp.buildItem(clicker, this.confirmIcon,
+                plugin.getParsedGUI().getItemReplacements(item, shop, clicker, plugin)), event -> {
+                if (!(event.getWhoClicked() instanceof Player player)) {
+                    return;
+                }
+                plugin.getScheduler().runForPlayer(player, () -> {
+                    final PurchaseResult result = plugin.getPurchaseService().attemptPurchase(player, shop, item);
+                    plugin.sendMessage(player, player, result.messageKey(), result.replacements());
+                    if (result.success()) {
+                        if (plugin.getConfig().getBoolean("other.close_on_buy")) {
+                            player.closeInventory();
+                        } else if (plugin.getAccessScheduleManager().isShopOpen()) {
+                            plugin.getParsedGUI().build(shop, plugin).open(player);
+                        } else {
+                            player.closeInventory();
+                        }
+                    }
+                });
+            });
+        }
+
+        for (Integer slot : this.denySlots) {
+            gui.setItem(slot, tp.buildItem(clicker, this.denyIcon,
+                plugin.getParsedGUI().getItemReplacements(item, shop, clicker, plugin)), event -> {
+                if (!(event.getWhoClicked() instanceof Player player)) {
+                    return;
+                }
+                plugin.getScheduler().runForPlayer(player, () -> {
+                    if (plugin.getAccessScheduleManager().isShopOpen() && plugin.getCurrencyRegistry().isLoaded()) {
                         plugin.getParsedGUI().build(shop, plugin).open(player);
                     } else {
                         player.closeInventory();
+                        plugin.sendMessage(player, player, "shop_not_open");
                     }
-                }
+                });
             });
-        });
-        for (Integer slot : this.confirmSlots) {
-            gui.addButton(slot, confirmButton);
-        }
-
-        final ItemButton denyButton = ItemButton.create(tp.buildItem(clicker, this.denyIcon,
-            plugin.getParsedGUI().getItemReplacements(item, shop, clicker, plugin)), event -> {
-            if (!(event.getWhoClicked() instanceof Player player)) {
-                return;
-            }
-            plugin.getScheduler().runForPlayer(player, () -> {
-                if (plugin.getAccessScheduleManager().isShopOpen() && plugin.getCurrencyRegistry().isLoaded()) {
-                    plugin.getParsedGUI().build(shop, plugin).open(player);
-                } else {
-                    player.closeInventory();
-                    plugin.sendMessage(player, player, "shop_not_open");
-                }
-            });
-        });
-        for (Integer slot : this.denySlots) {
-            gui.addButton(slot, denyButton);
         }
 
         return gui;

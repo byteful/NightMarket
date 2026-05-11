@@ -8,8 +8,8 @@ import java.util.UUID;
 import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.shop.item.ShopItem;
 import me.byteful.plugin.nightmarket.shop.item.ShopItemRegistry;
+import me.byteful.plugin.nightmarket.util.WeightedPicker;
 import org.bukkit.entity.Player;
-import redempt.redlib.misc.WeightedRandom;
 
 public class PlayerShop {
     private final UUID uniqueId;
@@ -52,9 +52,9 @@ public class PlayerShop {
             }
         }
 
-        WeightedRandom<ShopItem> random = WeightedRandom.fromCollection(rollItems, x -> x, ShopItem::rarity);
+        final WeightedPicker<ShopItem> random = WeightedPicker.fromCollection(rollItems, ShopItem::rarity);
         final List<String> generated = new ArrayList<>();
-        final int itemCount = Math.min(maxItems, random.getWeights().size());
+        final int itemCount = Math.min(maxItems, random.size());
         for (int i = 0; i < itemCount; i++) {
             final ShopItem item = random.roll();
             random.remove(item);
