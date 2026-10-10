@@ -35,7 +35,12 @@ public class CoinsEngineCurrency implements Currency {
 
     @Override
     public void withdraw(UUID player, double amount) {
-        CoinsEngineAPI.removeBalance(player, this.adapter, amount);
+        this.tryWithdraw(player, amount);
+    }
+
+    @Override
+    public boolean tryWithdraw(UUID player, double amount) {
+        return CoinsEngineAPI.removeBalance(player, this.adapter, amount);
     }
 
     @Override

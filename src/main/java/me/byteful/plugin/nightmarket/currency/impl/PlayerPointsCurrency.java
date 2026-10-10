@@ -33,17 +33,29 @@ public class PlayerPointsCurrency implements Currency {
 
     @Override
     public boolean canPlayerAfford(UUID player, double price) {
-        return this.eco.look(player) >= price;
+        return this.eco.look(player) >= toPoints(price);
     }
 
     @Override
     public void withdraw(UUID player, double amount) {
-        this.eco.take(player, (int) amount);
+        this.tryWithdraw(player, amount);
+    }
+
+    @Override
+    public boolean tryWithdraw(UUID player, double amount) {
+        return this.eco.take(player, toPoints(amount));
+    }
+
+    // PlayerPoints balances are whole numbers. Round fractional prices up so they are never undercharged,
+    // and use the same value for the afford check and the displayed price.
+    private static int toPoints(double amount) {
+        return (int) Math.ceil(Math.abs(amount) - 1.0E-9);
     }
 
     @Override
     public String getName(double amount) {
-        return Text.formatCurrency(amount) + " " + (amount == 1 ? this.plugin.getConfig()
+        final int points = toPoints(amount);
+        return Text.formatCurrency(points) + " " + (points == 1 ? this.plugin.getConfig()
                                                                   .getString("default_currencies.playerpoints.name.singular", "Token") : this.plugin.getConfig()
                                                                                                                                          .getString(
                                                                                                                                              "default_currencies.playerpoints.name.plural",

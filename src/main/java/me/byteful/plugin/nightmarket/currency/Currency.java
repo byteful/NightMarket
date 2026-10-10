@@ -40,6 +40,20 @@ public interface Currency {
     void withdraw(UUID player, double amount);
 
     /**
+     * Takes the provided amount/price from the player's balance and reports whether it actually happened.
+     * Purchases are only completed when this returns true. Override this when the currency API can reject
+     * a withdrawal; the default calls {@link #withdraw(UUID, double)} and assumes it succeeded.
+     *
+     * @param player the player's unique ID
+     * @param amount the decimal price
+     * @return true if the amount was taken from the player's balance
+     */
+    default boolean tryWithdraw(UUID player, double amount) {
+        this.withdraw(player, amount);
+        return true;
+    }
+
+    /**
      * @param amount the amount of this currency
      * @return the formatted string (ex: '$10' or '10 coins')
      */

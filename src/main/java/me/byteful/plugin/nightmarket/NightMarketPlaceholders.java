@@ -60,7 +60,7 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
 
             final int limit = item.purchaseLimit();
             if (limit == Integer.MAX_VALUE) {
-                return this.plugin.getMessageManager().get("infinite_stock");
+                return this.plugin.getTextProvider().toLegacy(this.plugin.getMessageManager().get("infinite_stock"));
             }
 
             final boolean globalCheck = this.plugin.getConfig().getBoolean("other.global_purchase_limits");
@@ -82,19 +82,19 @@ public class NightMarketPlaceholders extends PlaceholderExpansion {
             }
 
             case "rotate": {
-                return this.plugin.getScheduleReplacementService().getReplacements(player)[5];
+                return this.plugin.getTextProvider().toLegacy(this.plugin.getScheduleReplacementService().getReplacements(player)[5]);
             }
 
             case "open": {
-                return this.plugin.getScheduleReplacementService().getReplacements(player)[1];
+                return this.plugin.getTextProvider().toLegacy(this.plugin.getScheduleReplacementService().getReplacements(player)[1]);
             }
 
             case "rotate_countdown": {
-                return this.plugin.getScheduleReplacementService().getReplacements(player)[7];
+                return this.plugin.getTextProvider().toLegacy(this.plugin.getScheduleReplacementService().getReplacements(player)[7]);
             }
 
             case "open_countdown": {
-                return this.plugin.getScheduleReplacementService().getReplacements(player)[3];
+                return this.plugin.getTextProvider().toLegacy(this.plugin.getScheduleReplacementService().getReplacements(player)[3]);
             }
 
             case "timezone": {

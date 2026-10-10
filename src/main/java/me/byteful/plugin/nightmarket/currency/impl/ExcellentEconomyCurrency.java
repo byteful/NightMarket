@@ -50,9 +50,14 @@ public class ExcellentEconomyCurrency implements Currency {
 
     @Override
     public void withdraw(UUID player, double amount) {
-        if (!this.api.withdraw(player, this.adapter, amount)) {
+        if (!this.tryWithdraw(player, amount)) {
             throw new IllegalStateException("ExcellentEconomy rejected withdraw operation for " + player);
         }
+    }
+
+    @Override
+    public boolean tryWithdraw(UUID player, double amount) {
+        return this.api.withdraw(player, this.adapter, amount);
     }
 
     @Override

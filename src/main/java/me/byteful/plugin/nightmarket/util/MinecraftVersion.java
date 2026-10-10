@@ -34,22 +34,29 @@ public final class MinecraftVersion {
         final String[] parts = normalized.split("\\.");
         final int[] numbers = new int[]{0, 0, 0};
         final int limit = Math.min(parts.length, numbers.length);
+        int parsed = 0;
 
         for (int index = 0; index < limit; index++) {
             final String part = parts[index].trim();
             if (part.isEmpty()) {
-                return unknown(bukkitVersion);
+                break;
             }
 
             try {
                 numbers[index] = Integer.parseInt(part);
             } catch (NumberFormatException e) {
-                return unknown(bukkitVersion);
+                break;
             }
 
             if (numbers[index] < 0) {
                 return unknown(bukkitVersion);
             }
+
+            parsed++;
+        }
+
+        if (parsed == 0) {
+            return unknown(bukkitVersion);
         }
 
         return new MinecraftVersion(numbers[0], numbers[1], numbers[2], bukkitVersion, true);

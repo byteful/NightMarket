@@ -4,7 +4,7 @@ import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.shop.player.PlayerShop;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.DefaultFor;
+import revxrsal.commands.annotation.CommandPlaceholder;
 import revxrsal.commands.annotation.Dependency;
 import revxrsal.commands.annotation.Description;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
@@ -15,7 +15,7 @@ public class NightMarketCommand {
     @Dependency
     private NightMarketPlugin plugin;
 
-    @DefaultFor({"nightmarket", "nmarket", "nightm"})
+    @CommandPlaceholder
     @Description("Opens the NightMarket GUI.")
     public void open(Player sender) {
         if (!this.plugin.getAccessScheduleManager().isShopOpen()) {

@@ -48,7 +48,11 @@ public class PurchaseService {
                 return validation;
             }
 
-            item.currency().withdraw(currentShop.getUniqueId(), item.amount());
+            if (!item.currency().tryWithdraw(currentShop.getUniqueId(), item.amount())) {
+                this.plugin.getLogger().warning("Currency '" + item.currency().getId() + "' rejected the withdrawal of " + item.amount()
+                    + " from " + buyer.getName() + " for NightMarket item " + item.id() + ". The purchase was cancelled.");
+                return PurchaseResult.failure("purchase_failed");
+            }
             currentShop.recordPurchase(this.plugin, item);
             this.lastPurchaseAt.put(cooldownKey, now);
             this.plugin.getScheduler().runAsync(() -> this.plugin.getDataStoreProvider().setPlayerShop(currentShop));

@@ -38,7 +38,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
-import revxrsal.commands.bukkit.BukkitCommandHandler;
+import revxrsal.commands.Lamp;
+import revxrsal.commands.bukkit.BukkitLamp;
+import revxrsal.commands.bukkit.actor.BukkitCommandActor;
 
 public final class NightMarketPlugin extends JavaPlugin {
     private final UpdateChecker updateChecker = new UpdateChecker(this);
@@ -125,11 +127,10 @@ public final class NightMarketPlugin extends JavaPlugin {
         this.reloadUpdateChecker();
         this.reloadGlobalPurchaseTask();
 
-        final BukkitCommandHandler commandHandler = BukkitCommandHandler.create(this);
-        commandHandler.registerDependency(NightMarketPlugin.class, this);
-        commandHandler.register(new NightMarketCommand());
-        commandHandler.register(new NightMarketAdminCommand());
-        commandHandler.registerBrigadier();
+        final Lamp<BukkitCommandActor> lamp = BukkitLamp.builder(this)
+            .dependency(NightMarketPlugin.class, this)
+            .build();
+        lamp.register(new NightMarketCommand(), new NightMarketAdminCommand());
         if (Bukkit.getPluginManager().isPluginEnabled("PlaceholderAPI")) {
             new NightMarketPlaceholders(this).register();
         }

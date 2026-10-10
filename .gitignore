@@ -1,28 +1,87 @@
-# User-specific stuff
-.idea/
+### OS ###
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
 
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.stackdump
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+### IDEs and editors ###
+# IntelliJ IDEA (shared run configs in .run/ stay tracked)
+.idea/
 *.iml
 *.ipr
 *.iws
-
-# IntelliJ
 out/
-# mpeltonen/sbt-idea plugin
 .idea_modules/
-
-# JIRA plugin
 atlassian-ide-plugin.xml
 
-# Compiled class file
+# Eclipse
+.project
+.classpath
+.settings/
+.factorypath
+.metadata/
+bin/
+.apt_generated/
+.apt_generated_tests/
+
+# VS Code
+.vscode/
+*.code-workspace
+.history/
+
+# NetBeans
+nbproject/private/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# Vim / Emacs / misc editors
+*.swp
+*.swo
+*.swn
+.#*
+\#*#
+*.sublime-workspace
+
+### Java ###
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
 *.ctxt
+.mtj.tmp/
+hs_err_pid*
+replay_pid*
 
-# Package Files #
+# Packages (bundled libs/ and the Gradle wrapper are re-included below)
 *.jar
 *.war
 *.nar
@@ -31,88 +90,30 @@ atlassian-ide-plugin.xml
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-
-*~
-
-# temporary files which can be created if a process still has a handle open of a deleted file
-.fuse_hidden*
-
-# KDE directory preferences
-.directory
-
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
-
-# .nfs files are created when an open file is removed but is still being accessed
-.nfs*
-
-# General
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Icon must end with two \r
-Icon
-
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
-
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
-
-# Windows thumbnail cache files
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-
-# Dump file
-*.stackdump
-
-# Folder config file
-[Dd]esktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
-# Windows Installer files
-*.cab
-*.msi
-*.msix
-*.msm
-*.msp
-
-# Windows shortcuts
-*.lnk
-
-.gradle
+### Gradle / Maven ###
+.gradle/
 build/
-
-# Ignore Gradle GUI config
-gradle-app.setting
-
-# Cache of project
-.gradletasknamecache
-
 **/build/
+!gradle/wrapper/gradle-wrapper.jar
+gradle-app.setting
+.gradletasknamecache
+.kotlin/
+target/
 
-# Common working directory
+### Local test servers and runtime output ###
 run/
+*.log
+logs/
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
-!gradle-wrapper.jar
+### Temp, backups and secrets ###
+*.tmp
+*.temp
+*.bak
+*.orig
+*.rej
+.env
+.env.*
+*.local
+
+# Bundled compile-only libraries
+!libs/*.jar

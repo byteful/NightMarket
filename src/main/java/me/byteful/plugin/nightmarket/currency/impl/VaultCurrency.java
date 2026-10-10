@@ -6,6 +6,7 @@ import me.byteful.plugin.nightmarket.NightMarketPlugin;
 import me.byteful.plugin.nightmarket.currency.Currency;
 import me.byteful.plugin.nightmarket.util.Text;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.economy.EconomyResponse;
 import org.bukkit.Bukkit;
 
 public class VaultCurrency implements Currency {
@@ -39,7 +40,13 @@ public class VaultCurrency implements Currency {
 
     @Override
     public void withdraw(UUID player, double amount) {
-        this.eco.withdrawPlayer(Bukkit.getOfflinePlayer(player), Math.abs(amount));
+        this.tryWithdraw(player, amount);
+    }
+
+    @Override
+    public boolean tryWithdraw(UUID player, double amount) {
+        final EconomyResponse response = this.eco.withdrawPlayer(Bukkit.getOfflinePlayer(player), Math.abs(amount));
+        return response != null && response.transactionSuccess();
     }
 
     @Override

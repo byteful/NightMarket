@@ -50,7 +50,9 @@ public class NightMarketAdminCommand {
     @Subcommand("forcerotate")
     @Description("Forcefully rotate provided player's NightMarket shop.")
     public void forceRotate(CommandSender sender, Player player) {
-        this.plugin.getPlayerShopManager().get(player).rotate(this.plugin, this.plugin.getShopItemRegistry(), player);
+        final PlayerShop shop = this.plugin.getPlayerShopManager().get(player);
+        shop.rotate(this.plugin, this.plugin.getShopItemRegistry(), player);
+        this.plugin.getScheduler().runAsync(() -> this.plugin.getDataStoreProvider().setPlayerShop(shop));
         this.plugin.sendMessage(sender, null, "force_rotated", "{player}", player.getName());
     }
 

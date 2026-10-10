@@ -4,11 +4,10 @@ plugins {
 }
 
 group = 'me.byteful.plugin.nightmarket'
-version = '1.3.1'
+version = '1.3.2'
 
 repositories {
     mavenCentral()
-    mavenLocal() // temp for XSeries
     maven {
         name = 'spigotmc-repo'
         url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
@@ -38,10 +37,6 @@ repositories {
         name = 'jitpack'
         url = 'https://jitpack.io'
     }
-    maven {
-        name = 'coinsengine'
-        url = 'https://repo.nightexpressdev.com/releases'
-    }
 }
 
 dependencies {
@@ -50,7 +45,7 @@ dependencies {
     compileOnly 'com.mojang:authlib:1.5.21'
 
     // Helper libs
-    implementation 'com.github.cryptomorin:XSeries:14.0.0' // must build from source as of may 10th 2026
+    implementation 'com.github.cryptomorin:XSeries:14.0.0'
     implementation 'org.bstats:bstats-bukkit:3.2.1'
     implementation 'com.zaxxer:HikariCP:7.0.2'
 
@@ -60,15 +55,16 @@ dependencies {
     compileOnly 'net.kyori:adventure-text-serializer-legacy:5.0.1'
 
     // Lamp command framework
-    implementation 'com.github.Revxrsal.Lamp:common:3.3.6'
-    implementation 'com.github.Revxrsal.Lamp:bukkit:3.3.6'
+    implementation 'io.github.revxrsal:lamp.common:4.0.0-rc.19'
+    implementation 'io.github.revxrsal:lamp.bukkit:4.0.0-rc.19'
+    implementation 'io.github.revxrsal:lamp.brigadier:4.0.0-rc.19'
 
     // External plugin libs
     compileOnly 'com.github.MilkBowl:VaultAPI:1.7.1'
     compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly 'org.black_ixx:playerpoints:3.3.2'
     compileOnly 'com.github.Auxilor:EcoBits:1.8.4'
-    compileOnly 'su.nightexpress.coinsengine:CoinsEngine:2.6.0'
+    compileOnly files('libs/CoinsEngine-2.6.0.jar') // upstream repo deleted CoinsEngine after ExcellentEconomy rebrand
 
     // Datastore libs (compileOnly as they are injected/loaded during runtime to minimize JAR space and isolate from other server/plugin depends)
     compileOnly 'org.mongodb:mongo-java-driver:3.12.14'
@@ -80,6 +76,10 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-parameters']
 }
 
 processResources {
@@ -94,6 +94,7 @@ processResources {
 shadowJar {
     minimize {
         exclude(dependency("com.github.cryptomorin:XSeries:.*"))
+        exclude(dependency("io.github.revxrsal:.*:.*"))
     }
     archiveBaseName.set("NightMarket")
     archiveClassifier.set("")
